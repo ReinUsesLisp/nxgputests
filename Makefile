@@ -223,7 +223,7 @@ endif
 #---------------------------------------------------------------------------------
 
 %.nvbin:	%.nvasm
-	@envyas -m gm107 -i $< > $@
+	@envyas -m gm107 -V sm60 -i $< > $@
 	@echo assembled ... $(notdir $@)
 
 %.nvbin.o %_nvbin.h	:	%.nvbin

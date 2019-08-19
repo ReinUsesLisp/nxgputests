@@ -8,6 +8,8 @@
 #include "dksh_gen.h"
 
 #include "constant_nvbin.h"
+#include "hadd2_r_mrg_h0_nvbin.h"
+#include "hadd2_r_mrg_h1_nvbin.h"
 #include "r2p_imm_b0_nvbin.h"
 
 #define CMDMEM_SIZE (3 * DK_MEMBLOCK_ALIGNMENT)
@@ -35,10 +37,15 @@ struct compute_test_descriptor
 	uint16_t num_barriers;
 };
 
+#define TEST(name, expected, id, num_gprs) \
+	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs }
+
 static struct compute_test_descriptor const test_descriptors[] =
 {
-	{ "Constant",   0xdeadbeef, &constant_nvbin_size,   constant_nvbin,   8 },
-	{ "R2P_IMM.B0", 0x0000aaaa, &r2p_imm_b0_nvbin_size, r2p_imm_b0_nvbin, 8 },
+	TEST("Constant",       0xdeadbeef, constant,       8),
+	TEST("HADD2_R.MRG_H0", 0xaaaa4200, hadd2_r_mrg_h0, 8),
+	TEST("HADD2_R.MRG_H1", 0x4200aaaa, hadd2_r_mrg_h1, 8),
+	TEST("R2P_IMM.B0",     0x0000aaaa, r2p_imm_b0,     8),
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
