@@ -22,7 +22,7 @@ struct compute_test_descriptor
 	uint8_t const* code;
 	uint8_t num_gprs;
 
-	bool (*check_results)(void*);
+	bool (*check_results)(void*, FILE*);
 	uint8_t workgroup_x_minus_1;
 	uint8_t workgroup_y_minus_1;
 	uint8_t workgroup_z_minus_1;
@@ -57,7 +57,7 @@ static DkMemBlock make_memory_block(DkDevice device, uint32_t size, uint32_t fla
 static bool execute_test(
 	struct compute_test_descriptor const* desc, DkQueue queue,
 	DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
-	DkMemBlock blk_cmdbuf, void* results)
+	DkMemBlock blk_cmdbuf, void* results, FILE* error_file)
 {
 	generate_compute_dksh(code, *desc->code_size, desc->code, desc->num_gprs,
 		desc->workgroup_x_minus_1 + 1, desc->workgroup_y_minus_1 + 1,
@@ -79,8 +79,15 @@ static bool execute_test(
 	dkQueueWaitIdle(queue);
 
 	if (desc->check_results)
-		return desc->check_results(results);
-	return *(uint32_t*)results == desc->expected_value;
+		return desc->check_results(results, error_file);
+
+	uint32_t result = *(uint32_t*)results;
+	if (result == desc->expected_value)
+		return true;
+
+	fprintf(error_file, "%s expected 0x%08x, got 0x%08x\n", desc->name,
+		desc->expected_value, result);
+	return false;
 }
 
 void run_compute_tests(DkDevice device, DkQueue queue)
@@ -111,6 +118,7 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 
 	printf("Running compute tests...\n\n");
 
+	FILE* error_file = fopen("nxgputests_error.txt", "a");
 	u64 real_start_time = armGetSystemTick();
 
 	size_t failures = 0;
@@ -126,7 +134,7 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 
 		u64 start_time = armGetSystemTick();
 		bool result = execute_test(desc, queue, blk_code, code_data, cmdbuf,
-			blk_cmdbuf, ssbo_data);
+			blk_cmdbuf, ssbo_data, error_file);
 
 		printf(" %s %2.2f sec\n", result ? "Passed" : "Failed",
 			to_seconds(armGetSystemTick() - start_time));
@@ -139,6 +147,10 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 		"Total Test time (real) = %.2f sec\n",
 		(int)((NUM_TESTS - failures) * 100 / (float)NUM_TESTS), failures,
 		NUM_TESTS, to_seconds(armGetSystemTick() - real_start_time));
+
+	fclose(error_file);
+
+	consoleUpdate(NULL);
 
 	dkMemBlockDestroy(blk_ssbo);
 	dkMemBlockDestroy(blk_code);
