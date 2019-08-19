@@ -36,7 +36,7 @@ int main()
 
 		consoleUpdate(NULL);
 	}
-	
+
 	dkQueueDestroy(queue);
 	dkDeviceDestroy(device);
 }
