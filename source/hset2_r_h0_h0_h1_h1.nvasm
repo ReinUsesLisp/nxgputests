@@ -1,0 +1,12 @@
+		sched (st 0) (st 0) (st 0)
+		mov $r0 c0[0x140] 0xf
+		mov $r1 c0[0x144] 0xf
+		mov32i $r3 0x3c004200 0xf
+
+		sched (st 0) (st 0) (st 0)
+		mov32i $r4 0x4a004a00 0xf
+		hset2 lt ftz and $r2 h0_h0 $r3 h1_h1 $r4 $p7
+		stg e b32 ncg[$r0] $r2
+
+		sched (st 0) (st 0) (st 0)
+		exit
