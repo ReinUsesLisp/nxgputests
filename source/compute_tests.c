@@ -126,7 +126,8 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 	{
 		struct compute_test_descriptor const* desc = &test_descriptors[i];
 
-		int written_chars = printf("%2zd/%2zd Test: %s ", i, NUM_TESTS, desc->name);
+		int written_chars =
+			printf("%2zd/%2zd Test: %s ", i + 1, NUM_TESTS, desc->name);
 		for (int i = 0; i < 30 - written_chars; ++i)
 			putc('.', stdout);
 
