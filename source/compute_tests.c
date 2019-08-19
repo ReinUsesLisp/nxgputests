@@ -16,15 +16,16 @@
 struct compute_test_descriptor
 {
 	char name[16];
-	bool (*check_results)(void*);
 	uint32_t expected_value;
 
 	uint32_t const* code_size;
 	uint8_t const* code;
 	uint8_t num_gprs;
-	uint8_t workgroup_x;
-	uint8_t workgroup_y;
-	uint8_t workgroup_z;
+
+	bool (*check_results)(void*);
+	uint8_t workgroup_x_minus_1;
+	uint8_t workgroup_y_minus_1;
+	uint8_t workgroup_z_minus_1;
 	uint8_t num_invokes_x_minus_1;
 	uint8_t num_invokes_y_minus_1;
 	uint8_t num_invokes_z_minus_1;
@@ -35,7 +36,7 @@ struct compute_test_descriptor
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
-	{ "Constant", NULL, 0xdeadbeef, &constant_nvbin_size, constant_nvbin, 8, 1, 1, 1 }
+	{ "Constant", 0xdeadbeef, &constant_nvbin_size, constant_nvbin, 8 }
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
@@ -59,8 +60,9 @@ static bool execute_test(
 	DkMemBlock blk_cmdbuf, void* results)
 {
 	generate_compute_dksh(code, *desc->code_size, desc->code, desc->num_gprs,
-		desc->workgroup_x, desc->workgroup_y, desc->workgroup_z,
-		desc->local_mem_size, desc->shared_mem_size, desc->num_barriers);
+		desc->workgroup_x_minus_1 + 1, desc->workgroup_y_minus_1 + 1,
+		desc->workgroup_z_minus_1 + 1, desc->local_mem_size,
+		desc->shared_mem_size, desc->num_barriers);
 
 	DkShader shader;
 	DkShaderMaker shader_mk;
