@@ -8,6 +8,7 @@
 #include "dksh_gen.h"
 
 #include "constant_nvbin.h"
+#include "r2p_imm_b0_nvbin.h"
 
 #define CMDMEM_SIZE (3 * DK_MEMBLOCK_ALIGNMENT)
 #define CODEMEM_SIZE (512 * 1024)
@@ -36,7 +37,8 @@ struct compute_test_descriptor
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
-	{ "Constant", 0xdeadbeef, &constant_nvbin_size, constant_nvbin, 8 }
+	{ "Constant",   0xdeadbeef, &constant_nvbin_size,   constant_nvbin,   8 },
+	{ "R2P_IMM.B0", 0x0000aaaa, &r2p_imm_b0_nvbin_size, r2p_imm_b0_nvbin, 8 },
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))

@@ -1,7 +1,12 @@
 		sched (st 0) (st 0) (st 0)
-		mov32i $r2 0xdeadbeef 0xf
 		mov $r0 c0[0x140] 0xf
 		mov $r1 c0[0x144] 0xf
+		mov32i $r2 1 0xf
+
+		sched (st 0) (st 0) (st 0)
+		r2p pr $r2 0xff
+	$p0 mov32i $r2 0xaaaa 0xf
+not $p0 mov32i $r2 0xbbbb 0xf
 
 		sched (st 0) (st 0) (st 0)
 		stg e b32 ncg[$r0] $r2
