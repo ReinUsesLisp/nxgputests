@@ -15,6 +15,9 @@
 #include "hset2_r_h1_h0_h1_h0_nvbin.h"
 #include "hset2_r_h0_h0_f32_nvbin.h"
 #include "hset2_r_h0_h0_h1_h1_nvbin.h"
+#include "hsetp2_r_f32_f32_nvbin.h"
+#include "hsetp2_r_h1_h0_f32_nvbin.h"
+#include "hsetp2_r_h_and_h1_h0_f32_nvbin.h"
 #include "r2p_imm_b0_nvbin.h"
 
 #define CMDMEM_SIZE (3 * DK_MEMBLOCK_ALIGNMENT)
@@ -47,15 +50,18 @@ struct compute_test_descriptor
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
-	TEST("Constant",            0xdeadbeef, constant,            8),
-	TEST("HADD2_R.MRG_H0",      0xaaaa4200, hadd2_r_mrg_h0,      8),
-	TEST("HADD2_R.MRG_H1",      0x4200aaaa, hadd2_r_mrg_h1,      8),
-	TEST("HSET2_R F32 F32",     0x3c003c00, hset2_r_f32_f32,     8),
-	TEST("HSET2_R H1_H0 F32",   0x00003c00, hset2_r_h1_h0_f32,   8),
-	TEST("HSET2_R H1_H0 H1_H0", 0xffff0000, hset2_r_h1_h0_h1_h0, 8),
-	TEST("HSET2_R H0_H0 F32",   0x3c003c00, hset2_r_h0_h0_f32,   8),
-	TEST("HSET2_R H0_H0 H1_H1", 0xffffffff, hset2_r_h0_h0_h1_h1, 8),
-	TEST("R2P_IMM.B0",          0x0000aaaa, r2p_imm_b0,          8),
+	TEST("Constant",                 0xdeadbeef, constant,                 8),
+	TEST("HADD2_R.MRG_H0",           0xaaaa4200, hadd2_r_mrg_h0,           8),
+	TEST("HADD2_R.MRG_H1",           0x4200aaaa, hadd2_r_mrg_h1,           8),
+	TEST("HSET2_R F32 F32",          0x3c003c00, hset2_r_f32_f32,          8),
+	TEST("HSET2_R H1_H0 F32",        0x00003c00, hset2_r_h1_h0_f32,        8),
+	TEST("HSET2_R H0_H0 F32",        0x3c003c00, hset2_r_h0_h0_f32,        8),
+	TEST("HSET2_R H0_H0 H1_H1",      0xffffffff, hset2_r_h0_h0_h1_h1,      8),
+	TEST("HSET2_R H1_H0 H1_H0",      0xffff0000, hset2_r_h1_h0_h1_h0,      8),
+	TEST("HSETP2_R F32 F32",         0x00010008, hsetp2_r_f32_f32,         8),
+	TEST("HSETP2_R H1_H0 F32",       0x00000008, hsetp2_r_h1_h0_f32,       8),
+	TEST("HSETP2_R.H_AND H1_H0 F32", 0x0000a008, hsetp2_r_h_and_h1_h0_f32, 8),
+	TEST("R2P_IMM.B0",               0x0000aaaa, r2p_imm_b0,               8),
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
