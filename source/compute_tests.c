@@ -8,6 +8,7 @@
 #include "dksh_gen.h"
 
 #include "constant_nvbin.h"
+#include "hadd2_r_h1_h0_nvbin.h"
 #include "hadd2_r_mrg_h0_nvbin.h"
 #include "hadd2_r_mrg_h1_nvbin.h"
 #include "hset2_r_f32_f32_nvbin.h"
@@ -51,6 +52,7 @@ struct compute_test_descriptor
 static struct compute_test_descriptor const test_descriptors[] =
 {
 	TEST("Constant",                 0xdeadbeef, constant,                 8),
+	TEST("HADD2_R.H1_H0",            0x42004200, hadd2_r_h1_h0,            8),
 	TEST("HADD2_R.MRG_H0",           0xaaaa4200, hadd2_r_mrg_h0,           8),
 	TEST("HADD2_R.MRG_H1",           0x4200aaaa, hadd2_r_mrg_h1,           8),
 	TEST("HSET2_R F32 F32",          0x3c003c00, hset2_r_f32_f32,          8),
