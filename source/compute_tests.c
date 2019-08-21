@@ -23,6 +23,9 @@
 #include "hadd2_r_sat_f32_f32_nvbin.h"
 #include "hadd2_r_mrg_h0_f32_f32_nvbin.h"
 #include "hadd2_r_mrg_h1_f32_f32_nvbin.h"
+#include "hfma2_rr_nvbin.h"
+#include "hfma2_rr_h1h0_nh1h0_h1h0_nvbin.h"
+#include "hfma2_rr_h1h0_h1h0_nh1h0_nvbin.h"
 #include "hset2_r_f32_f32_nvbin.h"
 #include "hset2_r_h1h0_f32_nvbin.h"
 #include "hset2_r_h1h0_h1h0_nvbin.h"
@@ -63,31 +66,34 @@ struct compute_test_descriptor
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
-	TEST("Constant",                  0xdeadbeef, constant,               8),
-	TEST("HADD2_R",                   0x40004400, hadd2_r,                8),
-	TEST("HADD2_R H1_H1 H1_H0",       0x40000000, hadd2_r_h1h1_h1h0,      8),
-	TEST("HADD2_R H0_H0 H1_H0",       0x46004400, hadd2_r_h0h0_h1h0,      8),
-	TEST("HADD2_R H1_H0 H1_H1",       0x40004600, hadd2_r_h1h0_h1h1,      8),
-	TEST("HADD2_R H1_H0 H0_H0",       0x00004400, hadd2_r_h1h0_h0h0,      8),
-	TEST("HADD2_R -H1_H0 -H1_H0",     0xc000c400, hadd2_r_nh1h0_nh1h0,    8),
-	TEST("HADD2_R |H1_H0| |H1_H0|",   0x47004000, hadd2_r_ah1h0_ah1h0,    8),
-	TEST("HADD2_R |H1_H0| -H1_H0",    0xc5004000, hadd2_r_ah1h0_nh1h0,    8),
-	TEST("HADD2_R -|H1_H0| -|H1_H0|", 0xc700c000, hadd2_r_nah1h0_nah1h0,  8),
-	TEST("HADD2_R F32 F32",           0x42004200, hadd2_r_f32_f32,        8),
-	TEST("HADD2_R -F32 F32",          0xbc00bc00, hadd2_r_nf32_f32,       8),
-	TEST("HADD2_R F32 -F32",          0xbc00bc00, hadd2_r_f32_nf32,       8),
-	TEST("HADD2_R.SAT F32 F32",       0x3c003c00, hadd2_r_sat_f32_f32,    8),
-	TEST("HADD2_R.MRG_H0 F32 F32",    0xaaaa4200, hadd2_r_mrg_h0_f32_f32, 8),
-	TEST("HADD2_R.MRG_H1 F32 F32",    0x4200aaaa, hadd2_r_mrg_h1_f32_f32, 8),
-	TEST("HSET2_R F32 F32",           0x3c003c00, hset2_r_f32_f32,        8),
-	TEST("HSET2_R H1_H0 F32",         0x00003c00, hset2_r_h1h0_f32,       8),
-	TEST("HSET2_R H0_H0 F32",         0x3c003c00, hset2_r_h0h0_f32,       8),
-	TEST("HSET2_R H0_H0 H1_H1",       0xffffffff, hset2_r_h0h0_h1h1,      8),
-	TEST("HSET2_R H1_H0 H1_H0",       0xffff0000, hset2_r_h1h0_h1h0,      8),
-	TEST("HSETP2_R F32 F32",          0x00010008, hsetp2_r_f32_f32,       8),
-	TEST("HSETP2_R H1_H0 F32",        0x00000008, hsetp2_r_h1h0_f32,      8),
-	TEST("HSETP2_R.H_AND H1_H0 F32",  0x0000a008, hsetp2_r_hand_h1h0_f32, 8),
-	TEST("R2P_IMM.B0",                0x0000aaaa, r2p_imm_b0,             8),
+	TEST("Constant",                    0xdeadbeef, constant,                 8),
+	TEST("HADD2_R",                     0x40004400, hadd2_r,                  8),
+	TEST("HADD2_R H1_H1 H1_H0",         0x40000000, hadd2_r_h1h1_h1h0,        8),
+	TEST("HADD2_R H0_H0 H1_H0",         0x46004400, hadd2_r_h0h0_h1h0,        8),
+	TEST("HADD2_R H1_H0 H1_H1",         0x40004600, hadd2_r_h1h0_h1h1,        8),
+	TEST("HADD2_R H1_H0 H0_H0",         0x00004400, hadd2_r_h1h0_h0h0,        8),
+	TEST("HADD2_R -H1_H0 -H1_H0",       0xc000c400, hadd2_r_nh1h0_nh1h0,      8),
+	TEST("HADD2_R |H1_H0| |H1_H0|",     0x47004000, hadd2_r_ah1h0_ah1h0,      8),
+	TEST("HADD2_R |H1_H0| -H1_H0",      0xc5004000, hadd2_r_ah1h0_nh1h0,      8),
+	TEST("HADD2_R -|H1_H0| -|H1_H0|",   0xc700c000, hadd2_r_nah1h0_nah1h0,    8),
+	TEST("HADD2_R F32 F32",             0x42004200, hadd2_r_f32_f32,          8),
+	TEST("HADD2_R -F32 F32",            0xbc00bc00, hadd2_r_nf32_f32,         8),
+	TEST("HADD2_R F32 -F32",            0xbc00bc00, hadd2_r_f32_nf32,         8),
+	TEST("HADD2_R.SAT F32 F32",         0x3c003c00, hadd2_r_sat_f32_f32,      8),
+	TEST("HADD2_R.MRG_H0 F32 F32",      0xaaaa4200, hadd2_r_mrg_h0_f32_f32,   8),
+	TEST("HADD2_R.MRG_H1 F32 F32",      0x4200aaaa, hadd2_r_mrg_h1_f32_f32,   8),
+	TEST("HFMA2_RR",                    0x47004000, hfma2_rr,                 8),
+	TEST("HFMA2_RR H1_H0 -H1_H0 H1_H0", 0x48804400, hfma2_rr_h1h0_nh1h0_h1h0, 8),
+	TEST("HFMA2_RR H1_H0 H1_H0 -H1_H0", 0xc880c400, hfma2_rr_h1h0_h1h0_nh1h0, 8),
+	TEST("HSET2_R F32 F32",             0x3c003c00, hset2_r_f32_f32,          8),
+	TEST("HSET2_R H1_H0 F32",           0x00003c00, hset2_r_h1h0_f32,         8),
+	TEST("HSET2_R H0_H0 F32",           0x3c003c00, hset2_r_h0h0_f32,         8),
+	TEST("HSET2_R H0_H0 H1_H1",         0xffffffff, hset2_r_h0h0_h1h1,        8),
+	TEST("HSET2_R H1_H0 H1_H0",         0xffff0000, hset2_r_h1h0_h1h0,        8),
+	TEST("HSETP2_R F32 F32",            0x00010008, hsetp2_r_f32_f32,         8),
+	TEST("HSETP2_R H1_H0 F32",          0x00000008, hsetp2_r_h1h0_f32,        8),
+	TEST("HSETP2_R.H_AND H1_H0 F32",    0x0000a008, hsetp2_r_hand_h1h0_f32,   8),
+	TEST("R2P_IMM.B0",                  0x0000aaaa, r2p_imm_b0,               8),
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
