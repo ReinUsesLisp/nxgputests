@@ -23,6 +23,7 @@
 #include "hadd2_r_sat_f32_f32_nvbin.h"
 #include "hadd2_r_mrg_h0_f32_f32_nvbin.h"
 #include "hadd2_r_mrg_h1_f32_f32_nvbin.h"
+#include "hadd2_imm_nvbin.h"
 #include "hmul2_r_nvbin.h"
 #include "hmul2_r_h1h1_h1h0_nvbin.h"
 #include "hmul2_r_h0h0_h1h0_nvbin.h"
@@ -98,6 +99,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("HADD2_R.SAT F32 F32",         0x3c003c00, hadd2_r_sat_f32_f32,      8),
 	TEST("HADD2_R.MRG_H0 F32 F32",      0xaaaa4200, hadd2_r_mrg_h0_f32_f32,   8),
 	TEST("HADD2_R.MRG_H1 F32 F32",      0x4200aaaa, hadd2_r_mrg_h1_f32_f32,   8),
+	TEST("HADD2_IMM",                   0x4b804400, hadd2_imm,                8),
 	TEST("HMUL2_R",                     0xc2004200, hmul2_r,                  8),
 	TEST("HMUL2_R H1_H1 H1_H0",         0xc200bc00, hmul2_r_h1h1_h1h0,        8),
 	TEST("HMUL2_R H0_H0 H1_H0",         0x48804200, hmul2_r_h0h0_h1h0,        8),
