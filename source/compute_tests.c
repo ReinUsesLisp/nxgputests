@@ -18,6 +18,9 @@
 #include "f2f_r_f32_f32_floor_nvbin.h"
 #include "f2f_r_f32_f32_ceil_nvbin.h"
 #include "f2f_r_f32_f32_trunc_nvbin.h"
+#include "f2f_r_f32_f16_nvbin.h"
+#include "f2f_r_f32_f16_abs_nvbin.h"
+#include "f2f_r_f32_f16_neg_nvbin.h"
 #include "hadd2_r_nvbin.h"
 #include "hadd2_r_h1h1_h1h0_nvbin.h"
 #include "hadd2_r_h0h0_h1h0_nvbin.h"
@@ -103,6 +106,9 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("F2F_R.F32.F32.FLOOR",         0xc2300000, f2f_r_f32_f32_floor,      8),
 	TEST("F2F_R.F32.F32.CEIL",          0xc22c0000, f2f_r_f32_f32_ceil,       8),
 	TEST("F2F_R.F32.F32.TRUNC",         0xc22c0000, f2f_r_f32_f32_trunc,      8),
+	TEST("F2F_R.F32.F16",               0x00003c00, f2f_r_f32_f16,            8),
+	TEST("F2F_R.F32.F16 |Ra|",          0x00004800, f2f_r_f32_f16_abs,        8),
+	TEST("F2F_R.F32.F16 -Ra",           0x0000bc00, f2f_r_f32_f16_neg,        8),
 	TEST("HADD2_R",                     0x40004400, hadd2_r,                  8),
 	TEST("HADD2_R H1_H1 H1_H0",         0x40000000, hadd2_r_h1h1_h1h0,        8),
 	TEST("HADD2_R H0_H0 H1_H0",         0x46004400, hadd2_r_h0h0_h1h0,        8),
