@@ -12,6 +12,9 @@
 
 FILE* begin_unit_test_report()
 {
+#ifdef SKIP_JSON
+	return NULL;
+#endif
 	FILE* report_file = fopen(APPNAME ".json", "w");
 	if (!report_file)
 	{
@@ -27,12 +30,12 @@ FILE* begin_unit_test_report()
 void unit_test_report(FILE* report_file, char const* test_name, bool pass,
 	size_t num_entries, uint32_t const* expected, uint32_t const* results)
 {
-	if (report_file)
-	{
-		fprintf(report_file,
-				"\t\t{\n\t\t\t\"name\": \"%s\",\n\t\t\t\"pass\": %s\n\t\t},\n",
-				test_name, pass ? "true" : "false");
-	}
+	if (!report_file)
+		return;
+
+	fprintf(report_file,
+		"\t\t{\n\t\t\t\"name\": \"%s\",\n\t\t\t\"pass\": %s\n\t\t},\n",
+		test_name, pass ? "true" : "false");
 
 	size_t len = strlen(test_name);
 	char* filename = malloc(len + EXTRA_CHARS);
