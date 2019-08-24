@@ -6,6 +6,7 @@
 
 #include "compute_tests.h"
 #include "dksh_gen.h"
+#include "unit_test_report.h"
 
 #include "constant_nvbin.h"
 #include "f2f_r_f32_f32_nvbin.h"
@@ -172,7 +173,7 @@ static DkMemBlock make_memory_block(DkDevice device, uint32_t size, uint32_t fla
 static bool execute_test(
 	struct compute_test_descriptor const* desc, DkQueue queue,
 	DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
-	DkMemBlock blk_cmdbuf, void* results, FILE* error_file)
+	DkMemBlock blk_cmdbuf, void* results, FILE* report_file)
 {
 	generate_compute_dksh(code, *desc->code_size, desc->code, desc->num_gprs,
 		desc->workgroup_x_minus_1 + 1, desc->workgroup_y_minus_1 + 1,
@@ -194,18 +195,15 @@ static bool execute_test(
 	dkQueueWaitIdle(queue);
 
 	if (desc->check_results)
-		return desc->check_results(results, error_file);
+		return desc->check_results(results, report_file);
 
-	uint32_t result = *(uint32_t*)results;
-	if (result == desc->expected_value)
-		return true;
-
-	fprintf(error_file, "%s expected 0x%08x, got 0x%08x\n", desc->name,
-		desc->expected_value, result);
-	return false;
+	bool pass = *(uint32_t*)results == desc->expected_value;
+	unit_test_report(report_file, desc->name, pass, 1, &desc->expected_value,
+		results);
+	return pass;
 }
 
-void run_compute_tests(DkDevice device, DkQueue queue)
+void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 {
 	DkMemBlock blk_cmdbuf = make_memory_block(device, CMDMEM_SIZE,
 		DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached);
@@ -233,7 +231,6 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 
 	printf("Running compute tests...\n\n");
 
-	FILE* error_file = fopen("nxgputests_error.txt", "w");
 	u64 real_start_time = armGetSystemTick();
 
 	size_t failures = 0;
@@ -249,16 +246,11 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 
 		consoleUpdate(NULL);
 
-		if (execute_test(desc, queue, blk_code, code_data, cmdbuf,
-				blk_cmdbuf, ssbo_data, error_file))
-		{
-			puts("Passed");
-		}
-		else
-		{
-			puts("Failed");
+		bool pass = execute_test(desc, queue, blk_code, code_data, cmdbuf,
+			blk_cmdbuf, ssbo_data, report_file);
+		if (!pass)
 			++failures;
-		}
+		puts(pass ? "Passed" : "Failed");
 
 		consoleUpdate(NULL);
 	}
@@ -267,8 +259,6 @@ void run_compute_tests(DkDevice device, DkQueue queue)
 		"Total Test time (real) = %.2f sec\n",
 		(int)((NUM_TESTS - failures) * 100 / (float)NUM_TESTS), failures,
 		NUM_TESTS, to_seconds(armGetSystemTick() - real_start_time));
-
-	fclose(error_file);
 
 	consoleUpdate(NULL);
 

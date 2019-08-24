@@ -4,6 +4,7 @@
 #include <deko3d.h>
 
 #include "compute_tests.h"
+#include "unit_test_report.h"
 
 void userAppInit()
 {
@@ -25,7 +26,9 @@ int main()
 	dkQueueMakerDefaults(&queue_mk, device);
 	DkQueue queue = dkQueueCreate(&queue_mk);
 
-	run_compute_tests(device, queue);
+	FILE* report_file = begin_unit_test_report();
+	run_compute_tests(device, queue, report_file);
+	finish_unit_test_report(report_file);
 
 	while (appletMainLoop())
 	{
