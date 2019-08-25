@@ -185,7 +185,7 @@ static bool execute_test(
 	dkShaderMakerDefaults(&shader_mk, blk_code, 0);
 	dkShaderInitialize(&shader, &shader_mk);
 
-	dkCmdBufAddMemory(cmdbuf, blk_cmdbuf, 0, CMDMEM_SIZE);
+	dkCmdBufClear(cmdbuf);
 	dkCmdBufBindShader(cmdbuf, &shader);
 	dkCmdBufDispatchCompute(cmdbuf, desc->num_invokes_x_minus_1 + 1,
 		desc->num_invokes_y_minus_1 + 1, desc->num_invokes_z_minus_1 + 1);
