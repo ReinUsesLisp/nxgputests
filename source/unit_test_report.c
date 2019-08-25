@@ -9,6 +9,7 @@
 
 #define APPNAME "nxgputests"
 #define EXTRA_CHARS (sizeof(APPNAME) + sizeof(".json") + 1)
+#define SKIP_JSON
 
 FILE* begin_unit_test_report()
 {
