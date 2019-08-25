@@ -61,6 +61,7 @@
 #include "hset2_r_h1h0_h1h0_nvbin.h"
 #include "hset2_r_h0h0_f32_nvbin.h"
 #include "hset2_r_h0h0_h1h1_nvbin.h"
+#include "hsetp2_r_p39_nvbin.h"
 #include "hsetp2_r_f32_f32_nvbin.h"
 #include "hsetp2_r_h1h0_f32_nvbin.h"
 #include "hsetp2_r_f32_ah1h0_nvbin.h"
@@ -151,6 +152,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("HSET2_R H0_H0 F32",           0x3c003c00, hset2_r_h0h0_f32,         8),
 	TEST("HSET2_R H0_H0 H1_H1",         0xffffffff, hset2_r_h0h0_h1h1,        8),
 	TEST("HSET2_R H1_H0 H1_H0",         0xffff0000, hset2_r_h1h0_h1h0,        8),
+	TEST("HSETP2_R P39",                0xccccccc2, hsetp2_r_p39,             8),
 	TEST("HSETP2_R F32 F32",            0x00010008, hsetp2_r_f32_f32,         8),
 	TEST("HSETP2_R H1_H0 F32",          0x00000008, hsetp2_r_h1h0_f32,        8),
 	TEST("HSETP2_R F32 |H1_H0|",        0x00010008, hsetp2_r_f32_ah1h0,       8),
