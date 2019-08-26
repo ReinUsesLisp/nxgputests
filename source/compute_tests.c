@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <switch.h>
 #include <deko3d.h>
@@ -68,10 +69,27 @@
 #include "hsetp2_r_f32_nh1h0_nvbin.h"
 #include "hsetp2_r_hand_h1h0_f32_nvbin.h"
 #include "r2p_imm_b0_nvbin.h"
+#include "shfl_idx_nvbin.h"
+#include "shfl_up_nvbin.h"
+#include "shfl_down_nvbin.h"
 
 #define CMDMEM_SIZE (3 * DK_MEMBLOCK_ALIGNMENT)
 #define CODEMEM_SIZE (512 * 1024)
 #define SSBO_SIZE (DK_MEMBLOCK_ALIGNMENT)
+
+#define DECLARE_TEST(id) \
+	static bool test_##id(char const* name, void* results, FILE* report_file);
+
+#define TEST(name, expected, id, num_gprs) \
+	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs }
+
+#define FULLTEST(name, id, num_gprs, workgroup_x, workgroup_y, workgroup_z, \
+	num_invokes_x, num_invokes_y, num_invokes_z, local_mem_size,            \
+	shared_mem_size, num_barriers)                                          \
+	{ name, 0, &id##_nvbin_size, id##_nvbin, num_gprs, test_##id,           \
+	  (workgroup_x) - 1, (workgroup_y) - 1, (workgroup_z) - 1,              \
+	  (num_invokes_x) - 1, (num_invokes_y) - 1, (num_invokes_z) - 1,        \
+	  local_mem_size, shared_mem_size, num_barriers }
 
 struct compute_test_descriptor
 {
@@ -82,7 +100,7 @@ struct compute_test_descriptor
 	uint8_t const* code;
 	uint8_t num_gprs;
 
-	bool (*check_results)(void*, FILE*);
+	bool (*check_results)(char const*, void*, FILE*);
 	uint8_t workgroup_x_minus_1;
 	uint8_t workgroup_y_minus_1;
 	uint8_t workgroup_z_minus_1;
@@ -94,8 +112,9 @@ struct compute_test_descriptor
 	uint16_t num_barriers;
 };
 
-#define TEST(name, expected, id, num_gprs) \
-	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs }
+DECLARE_TEST(shfl_idx)
+DECLARE_TEST(shfl_up)
+DECLARE_TEST(shfl_down)
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
@@ -159,6 +178,10 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("HSETP2_R F32 -H1_H0",         0x00010008, hsetp2_r_f32_nh1h0,       8),
 	TEST("HSETP2_R.H_AND H1_H0 F32",    0x0000a008, hsetp2_r_hand_h1h0_f32,   8),
 	TEST("R2P_IMM.B0",                  0x0000aaaa, r2p_imm_b0,               8),
+
+	FULLTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
+	FULLTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
+	FULLTEST("SHFL.DOWN", shfl_down, 8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
@@ -201,7 +224,7 @@ static bool execute_test(
 	dkQueueWaitIdle(queue);
 
 	if (desc->check_results)
-		return desc->check_results(results, report_file);
+		return desc->check_results(desc->name, results, report_file);
 
 	bool pass = *(uint32_t*)results == desc->expected_value;
 	unit_test_report(report_file, desc->name, pass, 1, &desc->expected_value,
@@ -272,4 +295,33 @@ void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 	dkMemBlockDestroy(blk_code);
 	dkCmdBufDestroy(cmdbuf);
 	dkMemBlockDestroy(blk_cmdbuf);
+}
+
+static bool compare_array(char const* name, void* results, FILE* report_file,
+	size_t num_entries, uint32_t const* expected)
+{
+	bool pass = !memcmp(results, expected, num_entries * sizeof(uint32_t));
+	unit_test_report(report_file, name, pass, num_entries, expected, results);
+	return pass;
+}
+
+static bool test_shfl_idx(char const* name, void* results, FILE* report_file)
+{
+	static uint32_t const expected[] = {0x4444, 0x4444, 0x4444, 0x4444,
+		                                0x4444, 0x4444, 0x4444, 0x4444};
+	return compare_array(name, results, report_file, 8, expected);
+}
+
+static bool test_shfl_up(char const* name, void* results, FILE* report_file)
+{
+	static uint32_t const expected[] = {0xdead, 0xdead, 0xdead, 0x0000,
+	                                    0x2222, 0x4444, 0x6666, 0x8888, };
+	return compare_array(name, results, report_file, 8, expected);
+}
+
+static bool test_shfl_down(char const* name, void* results, FILE* report_file)
+{
+	static uint32_t const expected[] = {0x4444, 0x6666, 0x8888, 0xaaaa,
+	                                    0xcccc, 0xeeee, 0xdead, 0xdead};
+	return compare_array(name, results, report_file, 8, expected);
 }
