@@ -200,14 +200,14 @@ static DkMemBlock make_memory_block(DkDevice device, uint32_t size, uint32_t fla
 }
 
 static bool execute_test(
-	struct compute_test_descriptor const* desc, DkQueue queue,
+	struct compute_test_descriptor const* test, DkQueue queue,
 	DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
 	DkMemBlock blk_cmdbuf, void* results, FILE* report_file)
 {
-	generate_compute_dksh(code, *desc->code_size, desc->code, desc->num_gprs,
-		desc->workgroup_x_minus_1 + 1, desc->workgroup_y_minus_1 + 1,
-		desc->workgroup_z_minus_1 + 1, desc->local_mem_size,
-		desc->shared_mem_size, desc->num_barriers);
+	generate_compute_dksh(code, *test->code_size, test->code, test->num_gprs,
+		test->workgroup_x_minus_1 + 1, test->workgroup_y_minus_1 + 1,
+		test->workgroup_z_minus_1 + 1, test->local_mem_size,
+		test->shared_mem_size, test->num_barriers);
 
 	DkShader shader;
 	DkShaderMaker shader_mk;
@@ -216,18 +216,18 @@ static bool execute_test(
 
 	dkCmdBufClear(cmdbuf);
 	dkCmdBufBindShader(cmdbuf, &shader);
-	dkCmdBufDispatchCompute(cmdbuf, desc->num_invokes_x_minus_1 + 1,
-		desc->num_invokes_y_minus_1 + 1, desc->num_invokes_z_minus_1 + 1);
+	dkCmdBufDispatchCompute(cmdbuf, test->num_invokes_x_minus_1 + 1,
+		test->num_invokes_y_minus_1 + 1, test->num_invokes_z_minus_1 + 1);
 	DkCmdList list = dkCmdBufFinishList(cmdbuf);
 
 	dkQueueSubmitCommands(queue, list);
 	dkQueueWaitIdle(queue);
 
-	if (desc->check_results)
-		return desc->check_results(desc->name, results, report_file);
+	if (test->check_results)
+		return test->check_results(test->name, results, report_file);
 
-	bool pass = *(uint32_t*)results == desc->expected_value;
-	unit_test_report(report_file, desc->name, pass, 1, &desc->expected_value,
+	bool pass = *(uint32_t*)results == test->expected_value;
+	unit_test_report(report_file, test->name, pass, 1, &test->expected_value,
 		results);
 	return pass;
 }
@@ -265,17 +265,17 @@ void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 	size_t failures = 0;
 	for (size_t i = 0; i < NUM_TESTS; ++i)
 	{
-		struct compute_test_descriptor const* desc = &test_descriptors[i];
+		struct compute_test_descriptor const* test = &test_descriptors[i];
 
 		int written_chars =
-			printf("%2zd/%2zd Test: %s", i + 1, NUM_TESTS, desc->name);
+			printf("%2zd/%2zd Test: %s", i + 1, NUM_TESTS, test->name);
 		for (int i = 0; i < 41 - written_chars; ++i)
 			putc('.', stdout);
 		putc(' ', stdout);
 
 		consoleUpdate(NULL);
 
-		bool pass = execute_test(desc, queue, blk_code, code_data, cmdbuf,
+		bool pass = execute_test(test, queue, blk_code, code_data, cmdbuf,
 			blk_cmdbuf, ssbo_data, report_file);
 		if (!pass)
 			++failures;
