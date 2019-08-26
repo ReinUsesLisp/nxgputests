@@ -9,11 +9,10 @@
 
 #define APPNAME "nxgputests"
 #define EXTRA_CHARS (sizeof(APPNAME) + sizeof(".json") + 1)
-#define SKIP_JSON
 
 FILE* begin_unit_test_report()
 {
-#ifdef SKIP_JSON
+#ifndef ENABLE_JSON
 	return NULL;
 #endif
 	FILE* report_file = fopen(APPNAME ".json", "w");
