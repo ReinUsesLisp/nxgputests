@@ -23,6 +23,22 @@
 #include "f2f_r_f32_f16_nvbin.h"
 #include "f2f_r_f32_f16_abs_nvbin.h"
 #include "f2f_r_f32_f16_neg_nvbin.h"
+#include "f2i_r_u32_f16_h0_nvbin.h"
+#include "f2i_r_u32_f16_h1_nvbin.h"
+#include "f2i_r_u32_f16_ah1_nvbin.h"
+#include "f2i_r_u32_f16_nh1_nvbin.h"
+#include "f2i_r_u32_f16_rounding_nvbin.h"
+#include "f2i_r_u32_f16_clamped_nvbin.h"
+#include "f2i_r_u32_f16_floor_nvbin.h"
+#include "f2i_r_u32_f16_ceil_nvbin.h"
+#include "f2i_r_u32_f16_trunc_nvbin.h"
+#include "f2i_r_s32_f16_h0_nvbin.h"
+#include "f2i_r_s32_f16_h1_nvbin.h"
+#include "f2i_r_s32_f16_ah1_nvbin.h"
+#include "f2i_r_s32_f16_nh1_nvbin.h"
+#include "f2i_r_s32_f16_floor_nvbin.h"
+#include "f2i_r_s32_f16_ceil_nvbin.h"
+#include "f2i_r_s32_f16_trunc_nvbin.h"
 #include "hadd2_r_nvbin.h"
 #include "hadd2_r_h1h1_h1h0_nvbin.h"
 #include "hadd2_r_h0h0_h1h0_nvbin.h"
@@ -132,6 +148,22 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("F2F_R.F32.F16",               0x00003c00, f2f_r_f32_f16,            8),
 	TEST("F2F_R.F32.F16 |Ra|",          0x00004800, f2f_r_f32_f16_abs,        8),
 	TEST("F2F_R.F32.F16 -Ra",           0x0000bc00, f2f_r_f32_f16_neg,        8),
+	TEST("F2I_R.U32.F16 Ra.H0",         0x00000017, f2i_r_u32_f16_h0,         8),
+	TEST("F2I_R.U32.F16 Ra.H1",         0x00000035, f2i_r_u32_f16_h1,         8),
+	TEST("F2I_R.U32.F16 |Ra.H1|",       0x0000003f, f2i_r_u32_f16_ah1,        8),
+	TEST("F2I_R.U32.F16 -Ra.H1",        0x0000003f, f2i_r_u32_f16_nh1,        8),
+	TEST("F2I_R.U32.F16 Rounding",      0x00000005, f2i_r_u32_f16_rounding,   8),
+	TEST("F2I_R.U32.F16 Clamped",       0x00000001, f2i_r_u32_f16_clamped,    8),
+	TEST("F2I_R.U32.F16.FLOOR",         0x00000004, f2i_r_u32_f16_floor,      8),
+	TEST("F2I_R.U32.F16.CEIL",          0x00000008, f2i_r_u32_f16_ceil,       8),
+	TEST("F2I_R.U32.F16.TRUNC",         0x00000007, f2i_r_u32_f16_trunc,      8),
+	TEST("F2I_R.S32.F16 Ra.H0",         0x00000008, f2i_r_s32_f16_h0,         8),
+	TEST("F2I_R.S32.F16 Ra.H1",         0xfffffff8, f2i_r_s32_f16_h1,         8),
+	TEST("F2I_R.S32.F16 |Ra.H1|",       0x00000020, f2i_r_s32_f16_ah1,        8),
+	TEST("F2I_R.S32.F16 -Ra.H1",        0xffffffb4, f2i_r_s32_f16_nh1,        8),
+	TEST("F2I_R.S32.F16.FLOOR",         0xfffffffd, f2i_r_s32_f16_floor,      8),
+	TEST("F2I_R.S32.F16.CEIL",          0xfffffffe, f2i_r_s32_f16_ceil,       8),
+	TEST("F2I_R.S32.F16.TRUNC",         0xfffffff7, f2i_r_s32_f16_trunc,      8),
 	TEST("HADD2_R",                     0x40004400, hadd2_r,                  8),
 	TEST("HADD2_R H1_H1 H1_H0",         0x40000000, hadd2_r_h1h1_h1h0,        8),
 	TEST("HADD2_R H0_H0 H1_H0",         0x46004400, hadd2_r_h0h0_h1h0,        8),
