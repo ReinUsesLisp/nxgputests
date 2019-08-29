@@ -4,6 +4,6 @@
 		mov32i $r2 0xd3e0cd00 0xf
 
 		sched (st 0) (st 0) (st 0)
-		f2i ftz u32 f16 h1 $r2 abs $r2
+		f2i ftz u32 f16 $r2 abs h1 $r2
 		stg e b32 ncg[$r0] $r2
 		exit
