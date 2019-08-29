@@ -23,6 +23,16 @@
 #include "f2f_r_f32_f16_nvbin.h"
 #include "f2f_r_f32_f16_abs_nvbin.h"
 #include "f2f_r_f32_f16_neg_nvbin.h"
+#include "f2f_r_f16_f16_nvbin.h"
+#include "f2f_r_f16_f16_h1_nvbin.h"
+#include "f2f_r_f16_f16_abs_nvbin.h"
+#include "f2f_r_f16_f16_neg_nvbin.h"
+#include "f2f_r_f16_f16_sat_nvbin.h"
+#include "f2f_r_f16_f16_sat_neg_nvbin.h"
+#include "f2f_r_f16_f16_round_nvbin.h"
+#include "f2f_r_f16_f16_floor_nvbin.h"
+#include "f2f_r_f16_f16_ceil_nvbin.h"
+#include "f2f_r_f16_f16_trunc_nvbin.h"
 #include "f2i_r_u32_f16_h0_nvbin.h"
 #include "f2i_r_u32_f16_h1_nvbin.h"
 #include "f2i_r_u32_f16_ah1_nvbin.h"
@@ -148,6 +158,16 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("F2F_R.F32.F16",               0x00003c00, f2f_r_f32_f16,            8),
 	TEST("F2F_R.F32.F16 |Ra|",          0x00004800, f2f_r_f32_f16_abs,        8),
 	TEST("F2F_R.F32.F16 -Ra",           0x0000bc00, f2f_r_f32_f16_neg,        8),
+	TEST("F2F_R.F16.F16",               0x00004a33, f2f_r_f16_f16,            8),
+	TEST("F2F_R.F16.F16 Ra.H1",         0x000050c0, f2f_r_f16_f16_h1,         8),
+	TEST("F2F_R.F16.F16 |Ra|",          0x00005595, f2f_r_f16_f16_abs,        8),
+	TEST("F2F_R.F16.F16 -Ra",           0x000055c6, f2f_r_f16_f16_neg,        8),
+	TEST("F2F_R.F16.F16.SAT",           0x00000000, f2f_r_f16_f16_sat,        8),
+	TEST("F2F_R.F16.F16.SAT -Ra",       0x00003c00, f2f_r_f16_f16_sat_neg,    8),
+	TEST("F2F_R.F16.F16.ROUND",         0x0000c900, f2f_r_f16_f16_round,      8),
+	TEST("F2F_R.F16.F16.FLOOR",         0x0000c900, f2f_r_f16_f16_floor,      8),
+	TEST("F2F_R.F16.F16.CEIL",          0x0000c880, f2f_r_f16_f16_ceil,       8),
+	TEST("F2F_R.F16.F16.TRUNC",         0x0000cb00, f2f_r_f16_f16_trunc,      8),
 	TEST("F2I_R.U32.F16 Ra.H0",         0x00000017, f2i_r_u32_f16_h0,         8),
 	TEST("F2I_R.U32.F16 Ra.H1",         0x00000035, f2i_r_u32_f16_h1,         8),
 	TEST("F2I_R.U32.F16 |Ra.H1|",       0x0000003f, f2i_r_u32_f16_ah1,        8),
