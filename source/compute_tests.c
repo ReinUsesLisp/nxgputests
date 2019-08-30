@@ -359,21 +359,18 @@ static bool compare_array(char const* name, void* results, FILE* report_file,
 
 static bool test_shfl_idx(char const* name, void* results, FILE* report_file)
 {
-	static uint32_t const expected[] = {0x4444, 0x4444, 0x4444, 0x4444,
-		                                0x4444, 0x4444, 0x4444, 0x4444};
+	static uint32_t const expected[] = {2, 2, 2, 2, 2, 2, 2, 2};
 	return compare_array(name, results, report_file, 8, expected);
 }
 
 static bool test_shfl_up(char const* name, void* results, FILE* report_file)
 {
-	static uint32_t const expected[] = {0xdead, 0xdead, 0xdead, 0x0000,
-	                                    0x2222, 0x4444, 0x6666, 0x8888, };
+	static uint32_t const expected[] = {0xdead, 0xdead, 0xdead, 0, 1, 2, 3, 4};
 	return compare_array(name, results, report_file, 8, expected);
 }
 
 static bool test_shfl_down(char const* name, void* results, FILE* report_file)
 {
-	static uint32_t const expected[] = {0x4444, 0x6666, 0x8888, 0xaaaa,
-	                                    0xcccc, 0xeeee, 0xdead, 0xdead};
+	static uint32_t const expected[] = {2, 3, 4, 5, 6, 7, 0xdead, 0xdead};
 	return compare_array(name, results, report_file, 8, expected);
 }
