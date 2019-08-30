@@ -8,6 +8,7 @@
 #include "compute_tests.h"
 #include "dksh_gen.h"
 #include "unit_test_report.h"
+#include "helper.h"
 
 #include "constant_nvbin.h"
 #include "shr_r_s32_nvbin.h"
@@ -114,6 +115,7 @@
 #include "atoms_u32_max_nvbin.h"
 #include "atoms_s32_min_nvbin.h"
 #include "atoms_s32_max_nvbin.h"
+#include "sust_p_rgba_nvbin.h"
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
 #include "shfl_down_nvbin.h"
@@ -122,30 +124,32 @@
 #define CODEMEM_SIZE (512 * 1024)
 #define SSBO_SIZE (DK_MEMBLOCK_ALIGNMENT)
 
-#define DECLARE_TEST(id) \
-	static bool test_##id(char const* name, void* results, FILE* report_file);
-
 #define TEST(name, expected, id, num_gprs)                    \
 	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs, \
 	  .shared_mem_size = 512 }
 
-#define FULLTEST(name, id, num_gprs, workgroup_x, workgroup_y, workgroup_z, \
-	num_invokes_x, num_invokes_y, num_invokes_z, local_mem_size,            \
-	shared_mem_size, num_barriers)                                          \
-	{ name, 0, &id##_nvbin_size, id##_nvbin, num_gprs, test_##id,           \
-	  (workgroup_x) - 1, (workgroup_y) - 1, (workgroup_z) - 1,              \
-	  (num_invokes_x) - 1, (num_invokes_y) - 1, (num_invokes_z) - 1,        \
+#define ETEST(name, expected, id, num_gprs)                   \
+	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs, \
+	  execute_test_##id }
+
+#define MTEST(name, id, num_gprs, workgroup_x, workgroup_y, workgroup_z, \
+	num_invokes_x, num_invokes_y, num_invokes_z, local_mem_size,         \
+	shared_mem_size, num_barriers)                                       \
+	{ name, 0, &id##_nvbin_size, id##_nvbin, num_gprs, NULL, test_##id,  \
+	  (workgroup_x) - 1, (workgroup_y) - 1, (workgroup_z) - 1,           \
+	  (num_invokes_x) - 1, (num_invokes_y) - 1, (num_invokes_z) - 1,     \
 	  local_mem_size, shared_mem_size, num_barriers }
 
 struct compute_test_descriptor
 {
-	char name[28];
+	char const* name;
 	uint32_t expected_value;
 
 	uint32_t const* code_size;
 	uint8_t const* code;
 	uint8_t num_gprs;
 
+	void (*execute)(DkDevice, DkQueue, DkCmdBuf, void* results);
 	bool (*check_results)(char const*, void*, FILE*);
 	uint8_t workgroup_x_minus_1;
 	uint8_t workgroup_y_minus_1;
@@ -158,9 +162,11 @@ struct compute_test_descriptor
 	uint16_t num_barriers;
 };
 
-DECLARE_TEST(shfl_idx)
-DECLARE_TEST(shfl_up)
-DECLARE_TEST(shfl_down)
+DECLARE_ETEST(sust_p_rgba)
+
+DECLARE_MTEST(shfl_idx)
+DECLARE_MTEST(shfl_up)
+DECLARE_MTEST(shfl_down)
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
@@ -270,9 +276,11 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("ATOMS.MIN.S32",               0x90000000, atoms_s32_min,            8),
 	TEST("ATOMS.MAX.S32",               0x00000040, atoms_s32_max,            8),
 
-	FULLTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
-	FULLTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
-	FULLTEST("SHFL.DOWN", shfl_down, 8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
+	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
+
+	MTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
+	MTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
+	MTEST("SHFL.DOWN", shfl_down, 8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
@@ -282,18 +290,10 @@ static float to_seconds(u64 time)
     return (time * 625 / 12) / 1000000000.0f;
 }
 
-static DkMemBlock make_memory_block(DkDevice device, uint32_t size, uint32_t flags)
-{
-	DkMemBlockMaker maker;
-	dkMemBlockMakerDefaults(&maker, device, size);
-	maker.flags = flags;
-	return dkMemBlockCreate(&maker);
-}
-
 static bool execute_test(
-	struct compute_test_descriptor const* test, DkQueue queue,
-	DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
-	DkMemBlock blk_cmdbuf, void* results, FILE* report_file)
+	struct compute_test_descriptor const* test, DkDevice device,
+	DkQueue queue, DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
+	void* results, FILE* report_file)
 {
 	generate_compute_dksh(code, *test->code_size, test->code, test->num_gprs,
 		test->workgroup_x_minus_1 + 1, test->workgroup_y_minus_1 + 1,
@@ -307,12 +307,19 @@ static bool execute_test(
 
 	dkCmdBufClear(cmdbuf);
 	dkCmdBufBindShader(cmdbuf, &shader);
-	dkCmdBufDispatchCompute(cmdbuf, test->num_invokes_x_minus_1 + 1,
-		test->num_invokes_y_minus_1 + 1, test->num_invokes_z_minus_1 + 1);
-	DkCmdList list = dkCmdBufFinishList(cmdbuf);
 
-	dkQueueSubmitCommands(queue, list);
-	dkQueueWaitIdle(queue);
+	if (test->execute)
+	{
+		test->execute(device, queue, cmdbuf, results);
+	}
+	else
+	{
+		dkCmdBufDispatchCompute(cmdbuf, test->num_invokes_x_minus_1 + 1,
+			test->num_invokes_y_minus_1 + 1, test->num_invokes_z_minus_1 + 1);
+
+		dkQueueSubmitCommands(queue, dkCmdBufFinishList(cmdbuf));
+		dkQueueWaitIdle(queue);
+	}
 
 	if (test->check_results)
 		return test->check_results(test->name, results, report_file);
@@ -320,8 +327,6 @@ static bool execute_test(
 	bool pass = *(uint32_t*)results == test->expected_value;
 	unit_test_report(report_file, test->name, pass, 1, &test->expected_value,
 		results);
-	if (!pass)
-		printf("0x%08x vs 0x%08x ", test->expected_value, *(uint32_t*)results);
 	return pass;
 }
 
@@ -368,8 +373,8 @@ void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 
 		consoleUpdate(NULL);
 
-		bool pass = execute_test(test, queue, blk_code, code_data, cmdbuf,
-			blk_cmdbuf, ssbo_data, report_file);
+		bool pass = execute_test(test, device, queue, blk_code, code_data,
+			cmdbuf, ssbo_data, report_file);
 		if (!pass)
 			++failures;
 		puts(pass ? "Passed" : "Failed");
@@ -388,30 +393,4 @@ void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 	dkMemBlockDestroy(blk_code);
 	dkCmdBufDestroy(cmdbuf);
 	dkMemBlockDestroy(blk_cmdbuf);
-}
-
-static bool compare_array(char const* name, void* results, FILE* report_file,
-	size_t num_entries, uint32_t const* expected)
-{
-	bool pass = !memcmp(results, expected, num_entries * sizeof(uint32_t));
-	unit_test_report(report_file, name, pass, num_entries, expected, results);
-	return pass;
-}
-
-static bool test_shfl_idx(char const* name, void* results, FILE* report_file)
-{
-	static uint32_t const expected[] = {2, 2, 2, 2, 2, 2, 2, 2};
-	return compare_array(name, results, report_file, 8, expected);
-}
-
-static bool test_shfl_up(char const* name, void* results, FILE* report_file)
-{
-	static uint32_t const expected[] = {0xdead, 0xdead, 0xdead, 0, 1, 2, 3, 4};
-	return compare_array(name, results, report_file, 8, expected);
-}
-
-static bool test_shfl_down(char const* name, void* results, FILE* report_file)
-{
-	static uint32_t const expected[] = {2, 3, 4, 5, 6, 7, 0xdead, 0xdead};
-	return compare_array(name, results, report_file, 8, expected);
 }

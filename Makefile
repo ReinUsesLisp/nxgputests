@@ -39,9 +39,9 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/compute_tests
 DATA		:=	data
-INCLUDES	:=	include
+INCLUDES	:=	source
 NO_NACP		:=	yes
 
 #---------------------------------------------------------------------------------

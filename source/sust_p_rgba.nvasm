@@ -1,0 +1,14 @@
+		sched (st 0) (st 0) (st 0)
+		mov32i $r0 0x40f00000 0xf
+		mov32i $r1 0x40f00000 0xf
+		mov32i $r2 0x40f00000 0xf
+
+		sched (st 0) (st 0) (st 0)
+		mov32i $r3 0x40f00000 0xf
+		mov32i $r4 0 0xf
+		mov32i $r5 0 0xf
+
+		sched (st 0) (st 0) (st 0)
+		sust p t2d rgba ign g[$r4] $r0 0x48
+		exit
+		nop 0
