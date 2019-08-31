@@ -94,7 +94,10 @@
 #include "hsetp2_r_f32_ah1h0_nvbin.h"
 #include "hsetp2_r_f32_nh1h0_nvbin.h"
 #include "hsetp2_r_hand_h1h0_f32_nvbin.h"
-#include "r2p_imm_b0_nvbin.h"
+#include "r2p_imm_b0_pr_nvbin.h"
+#include "r2p_imm_b1_pr_nvbin.h"
+#include "r2p_imm_b2_pr_nvbin.h"
+#include "r2p_imm_b3_pr_nvbin.h"
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
 #include "shfl_down_nvbin.h"
@@ -229,7 +232,10 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("HSETP2_R F32 |H1_H0|",        0x00010008, hsetp2_r_f32_ah1h0,       8),
 	TEST("HSETP2_R F32 -H1_H0",         0x00010008, hsetp2_r_f32_nh1h0,       8),
 	TEST("HSETP2_R.H_AND H1_H0 F32",    0x0000a008, hsetp2_r_hand_h1h0_f32,   8),
-	TEST("R2P_IMM.B0",                  0x0000aaaa, r2p_imm_b0,               8),
+	TEST("R2P_IMM.B0 PR",               0x0000aaaa, r2p_imm_b0_pr,            8),
+	TEST("R2P_IMM.B1 PR",               0x0000bbbb, r2p_imm_b1_pr,            8),
+	TEST("R2P_IMM.B2 PR",               0x0000cccc, r2p_imm_b2_pr,            8),
+	TEST("R2P_IMM.B3 PR",               0x0000dddd, r2p_imm_b3_pr,            8),
 
 	FULLTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	FULLTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),

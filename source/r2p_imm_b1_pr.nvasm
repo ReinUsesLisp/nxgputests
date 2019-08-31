@@ -1,13 +1,14 @@
 		sched (st 0) (st 0) (st 0)
 		mov $r0 c0[0x140] 0xf
 		mov $r1 c0[0x144] 0xf
-		mov32i $r2 1 0xf
+		mov32i $r2 0x00000100 0xf
 
 		sched (st 0) (st 0) (st 0)
-		r2p pr $r2 0xff
-	$p0 mov32i $r2 0xaaaa 0xf
-not $p0 mov32i $r2 0xbbbb 0xf
+		r2p pr b1 $r2 0xff
+	$p0 mov32i $r2 0xbbbb 0xf
+not $p0 mov32i $r2 0x1111 0xf
 
 		sched (st 0) (st 0) (st 0)
 		stg e b32 ncg[$r0] $r2
 		exit
+		nop 0
