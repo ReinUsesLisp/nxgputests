@@ -13,6 +13,7 @@
 #include "shr_r_s32_nvbin.h"
 #include "shr_r_u32_nvbin.h"
 #include "shr_r_u32_w_nvbin.h"
+#include "shr_r_u32_clamped_nvbin.h"
 #include "shr_imm_s32_nvbin.h"
 #include "shr_imm_u32_nvbin.h"
 #include "f2f_r_f32_f32_nvbin.h"
@@ -156,6 +157,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("SHR_R.S32",                   0xff000000, shr_r_s32,                8),
 	TEST("SHR_R.U32",                   0x0f000000, shr_r_u32,                8),
 	TEST("SHR_R.U32.W",                 0x0000ff00, shr_r_u32_w,              8),
+	TEST("SHR_R.U32 Clamped",           0x00000001, shr_r_u32_clamped,        8),
 	TEST("SHR_IMM.S32",                 0xff000000, shr_imm_s32,              8),
 	TEST("SHR_IMM.U32",                 0x0f000000, shr_imm_u32,              8),
 	TEST("F2F_R.F32.F32",               0x40e00000, f2f_r_f32_f32,            8),
