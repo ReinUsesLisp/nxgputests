@@ -104,6 +104,9 @@
 #include "r2p_imm_b1_pr_nvbin.h"
 #include "r2p_imm_b2_pr_nvbin.h"
 #include "r2p_imm_b3_pr_nvbin.h"
+#include "shared_memory_nvbin.h"
+#include "sts_indirect_nvbin.h"
+#include "lds_indirect_nvbin.h"
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
 #include "shfl_down_nvbin.h"
@@ -115,8 +118,9 @@
 #define DECLARE_TEST(id) \
 	static bool test_##id(char const* name, void* results, FILE* report_file);
 
-#define TEST(name, expected, id, num_gprs) \
-	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs }
+#define TEST(name, expected, id, num_gprs)                    \
+	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs, \
+	  .shared_mem_size = 512 }
 
 #define FULLTEST(name, id, num_gprs, workgroup_x, workgroup_y, workgroup_z, \
 	num_invokes_x, num_invokes_y, num_invokes_z, local_mem_size,            \
@@ -248,6 +252,9 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("R2P_IMM.B1 PR",               0x0000bbbb, r2p_imm_b1_pr,            8),
 	TEST("R2P_IMM.B2 PR",               0x0000cccc, r2p_imm_b2_pr,            8),
 	TEST("R2P_IMM.B3 PR",               0x0000dddd, r2p_imm_b3_pr,            8),
+	TEST("LDS+STS",                     0xa0a0a0a0, shared_memory,            8),
+	TEST("STS Indirect",                0xdeadcafe, sts_indirect,             8),
+	TEST("LDS Indirect",                0xcafedead, lds_indirect,             8),
 
 	FULLTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	FULLTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
