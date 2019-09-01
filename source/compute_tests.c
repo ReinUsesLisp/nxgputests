@@ -106,6 +106,8 @@
 #include "r2p_imm_b3_pr_nvbin.h"
 #include "shared_memory_nvbin.h"
 #include "sts_indirect_nvbin.h"
+#include "sts_b64_nvbin.h"
+#include "sts_b128_nvbin.h"
 #include "lds_indirect_nvbin.h"
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
@@ -254,6 +256,8 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("R2P_IMM.B3 PR",               0x0000dddd, r2p_imm_b3_pr,            8),
 	TEST("LDS+STS",                     0xa0a0a0a0, shared_memory,            8),
 	TEST("STS Indirect",                0xdeadcafe, sts_indirect,             8),
+	TEST("STS.B64",                     0xddddbbbb, sts_b64,                  8),
+	TEST("STS.B128",                    0xddccbbaa, sts_b128,                 8),
 	TEST("LDS Indirect",                0xcafedead, lds_indirect,             8),
 
 	FULLTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
@@ -345,8 +349,8 @@ void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 		struct compute_test_descriptor const* test = &test_descriptors[i];
 
 		int written_chars =
-			printf("%2zd/%2zd Test: %s", i + 1, NUM_TESTS, test->name);
-		for (int i = 0; i < 41 - written_chars; ++i)
+			printf("%3zd/%3zd Test: %s", i + 1, NUM_TESTS, test->name);
+		for (int i = 0; i < 43 - written_chars; ++i)
 			putc('.', stdout);
 		putc(' ', stdout);
 
