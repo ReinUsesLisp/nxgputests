@@ -1,0 +1,14 @@
+		sched (st 0) (st 0) (st 0)
+		mov $r0 c0[0x140] 0xf
+		mov $r1 c0[0x144] 0xf
+		mov32i $r2 0x40 0xf
+
+		sched (st 0) (st 0) (st 0)
+		st b32 s[0] $r2
+		mov32i $r2 0x90000000 0xf
+		atoms min u32 $r3 s[0x0] $r2
+
+		sched (st 0) (st 0) (st 0)
+		ld b32 $r2 s[0]
+		stg e b32 ncg[$r0] $r2
+		exit

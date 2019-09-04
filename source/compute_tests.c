@@ -109,6 +109,11 @@
 #include "sts_b64_nvbin.h"
 #include "sts_b128_nvbin.h"
 #include "lds_indirect_nvbin.h"
+#include "atoms_u32_add_nvbin.h"
+#include "atoms_u32_min_nvbin.h"
+#include "atoms_u32_max_nvbin.h"
+#include "atoms_s32_min_nvbin.h"
+#include "atoms_s32_max_nvbin.h"
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
 #include "shfl_down_nvbin.h"
@@ -259,6 +264,11 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("STS.B64",                     0xddddbbbb, sts_b64,                  8),
 	TEST("STS.B128",                    0xddccbbaa, sts_b128,                 8),
 	TEST("LDS Indirect",                0xcafedead, lds_indirect,             8),
+	TEST("ATOMS.ADD.U32",               0x00000060, atoms_u32_add,            8),
+	TEST("ATOMS.MIN.U32",               0x00000040, atoms_u32_min,            8),
+	TEST("ATOMS.MAX.U32",               0x90000000, atoms_u32_max,            8),
+	TEST("ATOMS.MIN.S32",               0x90000000, atoms_s32_min,            8),
+	TEST("ATOMS.MAX.S32",               0x00000040, atoms_s32_max,            8),
 
 	FULLTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	FULLTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
@@ -310,6 +320,8 @@ static bool execute_test(
 	bool pass = *(uint32_t*)results == test->expected_value;
 	unit_test_report(report_file, test->name, pass, 1, &test->expected_value,
 		results);
+	if (!pass)
+		printf("0x%08x vs 0x%08x ", test->expected_value, *(uint32_t*)results);
 	return pass;
 }
 
