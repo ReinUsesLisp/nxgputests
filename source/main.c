@@ -3,17 +3,35 @@
 #include <switch.h>
 #include <deko3d.h>
 
+#include <unistd.h>
+
 #include "compute_tests.h"
 #include "unit_test_report.h"
+
+static int nxlink_socket = -1;
 
 void userAppInit()
 {
 	consoleInit(NULL);
+
+    if (R_FAILED(socketInitializeDefault()))
+        return;
+
+    nxlink_socket = nxlinkStdio();
+    if (nxlink_socket < 0)
+        socketExit();
 }
 
 void userAppExit()
 {
 	consoleExit(NULL);
+
+	if (nxlink_socket < 0)
+		return;
+
+	close(nxlink_socket);
+	socketExit();
+	nxlink_socket = -1;
 }
 
 int main()
