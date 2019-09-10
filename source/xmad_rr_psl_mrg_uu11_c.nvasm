@@ -1,0 +1,14 @@
+		sched (st 0) (st 0) (st 0)
+		mov $r4 c0[0x140] 0xf
+		mov $r5 c0[0x144] 0xf
+		mov32i $r0 0xd31891d0 0xf
+
+		sched (st 0) (st 0) (st 0)
+		mov32i $r1 0x9a321bc7 0xf
+		mov32i $r2 0xc3892d41 0xf
+		mov32i $r3 0xf0a4820a 0xf
+
+		sched (st 0) (st 0) (st 0)
+		xmad psl mrg $r0 h1 $r1 h1 $r2 $r3
+		stg e b32 ncg[$r4] $r0
+		exit
