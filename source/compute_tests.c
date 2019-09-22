@@ -147,6 +147,7 @@
 #include "atoms_s32_min_nvbin.h"
 #include "atoms_s32_max_nvbin.h"
 #include "sust_p_rgba_nvbin.h"
+#include "suld_p_rgba_nvbin.h"
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
 #include "shfl_down_nvbin.h"
@@ -194,6 +195,7 @@ struct compute_test_descriptor
 };
 
 DECLARE_ETEST(sust_p_rgba)
+DECLARE_ETEST(suld_p_rgba)
 
 DECLARE_MTEST(shfl_idx)
 DECLARE_MTEST(shfl_up)
@@ -338,6 +340,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("ATOMS.MAX.S32",               0x00000040, atoms_s32_max,             8),
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
+	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
 
 	MTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	MTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
@@ -386,6 +389,8 @@ static bool execute_test(
 		return test->check_results(test->name, results, report_file);
 
 	bool pass = *(uint32_t*)results == test->expected_value;
+	if (!pass)
+		printf("exp %08x got %08x ", test->expected_value, *(uint32_t*)results);
 	unit_test_report(report_file, test->name, pass, 1, &test->expected_value,
 		results);
 	return pass;
