@@ -151,6 +151,7 @@
 #include "shfl_idx_nvbin.h"
 #include "shfl_up_nvbin.h"
 #include "shfl_down_nvbin.h"
+#include "shfl_bfly_nvbin.h"
 
 #define CMDMEM_SIZE (3 * DK_MEMBLOCK_ALIGNMENT)
 #define CODEMEM_SIZE (512 * 1024)
@@ -200,6 +201,7 @@ DECLARE_ETEST(suld_p_rgba)
 DECLARE_MTEST(shfl_idx)
 DECLARE_MTEST(shfl_up)
 DECLARE_MTEST(shfl_down)
+DECLARE_MTEST(shfl_bfly)
 
 static struct compute_test_descriptor const test_descriptors[] =
 {
@@ -345,6 +347,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	MTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	MTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	MTEST("SHFL.DOWN", shfl_down, 8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
+	MTEST("SHFL.BFLY", shfl_bfly, 8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 };
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))

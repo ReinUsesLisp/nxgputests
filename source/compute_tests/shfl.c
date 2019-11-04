@@ -31,3 +31,9 @@ DEFINE_MTEST(shfl_down)
 	static uint32_t const expected[] = {2, 3, 4, 5, 6, 7, 0xdead, 0xdead};
 	return compare_array(name, results, report_file, 8, expected);
 }
+
+DEFINE_MTEST(shfl_bfly)
+{
+	static uint32_t const expected[] = {3, 2, 1, 0, 7, 6, 5, 4};
+	return compare_array(name, results, report_file, 8, expected);
+}
