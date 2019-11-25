@@ -8,10 +8,10 @@
 
 #define DEFINE_ETEST(id)    \
 	void execute_test_##id( \
-		DkDevice device, DkQueue queue, DkCmdBuf cmdbuf, void* results)
+		DkDevice device, DkQueue queue, DkCmdBuf cmdbuf, uint32_t* results)
 
 #define DEFINE_MTEST(id) \
-	bool test_##id(char const* name, void* results, FILE* report_file)
+	bool test_##id(char const* name, uint32_t* results, FILE* report_file)
 
 #define DECLARE_ETEST(id) DEFINE_ETEST(id);
 #define DECLARE_MTEST(id) DEFINE_MTEST(id);
