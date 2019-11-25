@@ -399,7 +399,26 @@ static bool execute_test(
 	return pass;
 }
 
-void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
+static void wait_for_input()
+{
+	printf("Press A to continue...");
+
+	while (true)
+	{
+		hidScanInput();
+
+		if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_A)
+			break;
+
+		consoleUpdate(NULL);
+	}
+
+	printf("\33[2K\r");
+	consoleUpdate(NULL);
+}
+
+void run_compute_tests(
+	DkDevice device, DkQueue queue, FILE* report_file, bool automatic_mode)
 {
 	DkMemBlock blk_cmdbuf = make_memory_block(device, CMDMEM_SIZE,
 		DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached);
@@ -449,6 +468,9 @@ void run_compute_tests(DkDevice device, DkQueue queue, FILE* report_file)
 		puts(pass ? "Passed" : "Failed");
 
 		consoleUpdate(NULL);
+
+		if (!automatic_mode && i != 0 && i % 43 == 0)
+			wait_for_input();
 	}
 
 	printf("\n%3d%% tests passed, %zd tests failed out of %zd\n\n"
