@@ -71,6 +71,7 @@
 #include "f2f_r_f16_f16_floor_nvbin.h"
 #include "f2f_r_f16_f16_ceil_nvbin.h"
 #include "f2f_r_f16_f16_trunc_nvbin.h"
+#include "f2i_r_s32_f32_nvbin.h"
 #include "f2i_r_u32_f16_h0_nvbin.h"
 #include "f2i_r_u32_f16_h1_nvbin.h"
 #include "f2i_r_u32_f16_ah1_nvbin.h"
@@ -265,6 +266,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("F2F_R.F16.F16.FLOOR",         0x0000c900, f2f_r_f16_f16_floor,       8),
 	TEST("F2F_R.F16.F16.CEIL",          0x0000c880, f2f_r_f16_f16_ceil,        8),
 	TEST("F2F_R.F16.F16.TRUNC",         0x0000cb00, f2f_r_f16_f16_trunc,       8),
+	TEST("F2I_R.S32.F32",               0x7fffffff, f2i_r_s32_f32,             8),
 	TEST("F2I_R.U32.F16 Ra.H0",         0x00000017, f2i_r_u32_f16_h0,          8),
 	TEST("F2I_R.U32.F16 Ra.H1",         0x00000035, f2i_r_u32_f16_h1,          8),
 	TEST("F2I_R.U32.F16 |Ra.H1|",       0x0000003f, f2i_r_u32_f16_ah1,         8),
