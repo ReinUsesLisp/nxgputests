@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <deko3d.h>
 
@@ -17,3 +18,7 @@
 #define DECLARE_MTEST(id) DEFINE_MTEST(id);
 
 DkMemBlock make_memory_block(DkDevice device, size_t size, uint32_t flags);
+
+bool compare_array(
+	char const* name, uint32_t* results, FILE* report_file, size_t num_entries,
+	uint32_t const* expected);

@@ -6,14 +6,6 @@
 #include "helper.h"
 #include "unit_test_report.h"
 
-static bool compare_array(char const* name, uint32_t* results,
-	FILE* report_file, size_t num_entries, uint32_t const* expected)
-{
-	bool pass = !memcmp(results, expected, num_entries * sizeof(uint32_t));
-	unit_test_report(report_file, name, pass, num_entries, expected, results);
-	return pass;
-}
-
 DEFINE_MTEST(shfl_idx)
 {
 	static uint32_t const expected[] = {2, 2, 2, 2, 2, 2, 2, 2};
