@@ -447,7 +447,8 @@ void run_compute_tests(
 
 	printf("Running compute tests...\n\n");
 
-	u64 real_start_time = armGetSystemTick();
+	u64 start_time = armGetSystemTick();
+	u64 total_time = 0;
 
 	size_t failures = 0;
 	for (size_t i = 0; i < NUM_TESTS; ++i)
@@ -471,13 +472,21 @@ void run_compute_tests(
 		consoleUpdate(NULL);
 
 		if (!automatic_mode && i != 0 && i % 43 == 0)
+		{
+			total_time += armGetSystemTick() - start_time;
+
 			wait_for_input();
+
+			start_time = armGetSystemTick();
+		}
 	}
+
+	total_time += armGetSystemTick() - start_time;
 
 	printf("\n%3d%% tests passed, %zd tests failed out of %zd\n\n"
 		"Total Test time (real) = %.2f sec\n",
 		(int)((NUM_TESTS - failures) * 100 / (float)NUM_TESTS), failures,
-		NUM_TESTS, to_seconds(armGetSystemTick() - real_start_time));
+		NUM_TESTS, to_seconds(total_time));
 
 	consoleUpdate(NULL);
 
