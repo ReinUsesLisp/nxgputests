@@ -199,6 +199,12 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("ATOMS.MAX.U32",               0x90000000, atoms_u32_max,             8),
 	TEST("ATOMS.MIN.S32",               0x90000000, atoms_s32_min,             8),
 	TEST("ATOMS.MAX.S32",               0x00000040, atoms_s32_max,             8),
+	TEST("IADD_R",                      0xbbccddee, iadd_r,                    8),
+	TEST("IADD_R -Ra",                  0x55443323, iadd_r_neg_a,              8),
+	TEST("IADD_R -Rb",                  0xaabbccdd, iadd_r_neg_b,              8),
+	TEST("IADD_R.SAT HIGH",             0x7fffffff, iadd_r_high_sat,           8),
+	TEST("IADD_R.SAT LOW",              0x80000000, iadd_r_low_sat,            8),
+	TEST("IADD_R.SAT FAKE",             0xd0000000, iadd_r_fake_sat,           8),
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
 	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
