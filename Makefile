@@ -110,7 +110,8 @@ export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES))) $(NVASMFILES:.nvas
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD)
+			-I$(CURDIR)/$(BUILD) \
+			-include switch.h $(addprefix -include ,$(HFILES_BIN))
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
