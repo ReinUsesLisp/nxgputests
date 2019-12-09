@@ -209,6 +209,8 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("IADD_R.CC ZERO",              0x00000001, iadd_r_cc_zero,            8),
 	TEST("IADD_R.CC SIGN",              0x9161ff02, iadd_r_cc_sign,            8),
 	TEST("IADD_R.CC CARRY",             0x00000604, iadd_r_cc_carry,           8),
+	TEST("IADD_R.X CARRY",              0xf0000601, iadd_r_x_carry,            8),
+	TEST("IADD_R.X FAKE",               0x20000601, iadd_r_x_fake,             8),
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
 	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
