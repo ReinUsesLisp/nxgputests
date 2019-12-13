@@ -238,6 +238,10 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("BFE_R.U32 Ra.CC",             0x7ae83c00, bfe_r_u32_cc,              8),
 	TEST("BFE_R Zero",                  0x00000000, bfe_r_zero,                8),
 	TEST("BFE_R Expand",                0xff800000, bfe_r_expand,              8),
+	TEST("BRA",                         0xcdcdacac, bra,                       8),
+	TEST("SSY",                         0xa0f943de, ssy,                       8),
+	TEST("BRK",                         0xbabadead, brk,                       8),
+	TEST("SSY & BRK",                   0x0000dddd, ssy_brk,                   8),
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
 	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
