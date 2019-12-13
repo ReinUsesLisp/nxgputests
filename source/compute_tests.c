@@ -221,6 +221,13 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("ISCADD_IMM.CC v3",            0x01000000, iscadd_imm_cc_v3,          8),
 	TEST("ISCADD_IMM.CC v4",            0x05000000, iscadd_imm_cc_v4,          8),
 	TEST("ISCADD_IMM.CC Fake",          0x5585ff00, iscadd_imm_cc_fake,        8),
+	TEST("FLO_R.S32",                   0x0000001e, flo_r_s32,                 8),
+	TEST("FLO_R.S32 ~Ra",               0x0000001c, flo_r_s32_inv,             8),
+	TEST("FLO_R.U32",                   0x00000013, flo_r_u32,                 8),
+	TEST("FLO_R.U32.SH",                0x00000013, flo_r_u32_sh,              8),
+	TEST("FLO_R Empty",                 0xffffffff, flo_r_empty,               8),
+	TEST("FLO_R.CC Fail",               0x02ffffff, flo_r_cc_fail,             8),
+	TEST("FLO_R.CC Zero",               0x02ffffff, flo_r_cc_zero,             8),
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
 	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
