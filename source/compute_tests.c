@@ -228,6 +228,8 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("FLO_R Empty",                 0xffffffff, flo_r_empty,               8),
 	TEST("FLO_R.CC Fail",               0x02ffffff, flo_r_cc_fail,             8),
 	TEST("FLO_R.CC Zero",               0x02ffffff, flo_r_cc_zero,             8),
+	TEST("POPC_R",                      0x0000000f, popc_r,                    8),
+	TEST("POPC_R ~Ra",                  0x00000011, popc_r_inv,                8),
 	TEST("BFE_R.S32",                   0xfffffff0, bfe_r_s32,                 8),
 	TEST("BFE_R.S32.BREV",              0x0000007f, bfe_r_s32_brev,            8),
 	TEST("BFE_R.S32 Ra.CC",             0xfae83c02, bfe_r_s32_cc,              8),
