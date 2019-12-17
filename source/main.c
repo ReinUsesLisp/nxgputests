@@ -39,6 +39,11 @@ void userAppExit()
 	nxlink_socket = -1;
 }
 
+static float to_seconds(u64 time)
+{
+    return (time * 625 / 12) / 1000000000.0f;
+}
+
 int main(int argc, char **argv)
 {
 	// TODO: Do proper parsing
@@ -57,13 +62,18 @@ int main(int argc, char **argv)
 	dkQueueMakerDefaults(&queue_mk, device);
 	DkQueue queue = dkQueueCreate(&queue_mk);
 
+	u64 total_time = 0;
 	FILE* report_file = begin_unit_test_report();
-	run_compute_tests(device, queue, report_file, is_automatic);
-	finish_unit_test_report(report_file);
 
-	printf("\nPress A to exit...");
-	wait_for_input();
+	total_time += run_compute_tests(device, queue, report_file, is_automatic);
+
+	finish_unit_test_report(report_file);
 
 	dkQueueDestroy(queue);
 	dkDeviceDestroy(device);
+
+	printf("Total Test time (real) = %.2f sec\n\n", to_seconds(total_time));
+
+	printf("\nPress A to exit...");
+	wait_for_input();
 }

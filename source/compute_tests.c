@@ -254,11 +254,6 @@ static struct compute_test_descriptor const test_descriptors[] =
 
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
-static float to_seconds(u64 time)
-{
-    return (time * 625 / 12) / 1000000000.0f;
-}
-
 static bool execute_test(
 	struct compute_test_descriptor const* test, DkDevice device,
 	DkQueue queue, DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
@@ -302,7 +297,7 @@ static bool execute_test(
 	return pass;
 }
 
-void run_compute_tests(
+u64 run_compute_tests(
 	DkDevice device, DkQueue queue, FILE* report_file, bool automatic_mode)
 {
 	DkMemBlock blk_cmdbuf = make_memory_block(device, CMDMEM_SIZE,
@@ -368,13 +363,14 @@ void run_compute_tests(
 
 	total_time += armGetSystemTick() - start_time;
 
-	printf("\n%3d%% tests passed, %zd tests failed out of %zd\n\n"
-		"Total Test time (real) = %.2f sec\n\n",
+	printf("\n%3d%% tests passed, %zd tests failed out of %zd\n\n",
 		(int)((NUM_TESTS - failures) * 100 / (float)NUM_TESTS), failures,
-		NUM_TESTS, to_seconds(total_time));
+		NUM_TESTS);
 
 	dkMemBlockDestroy(blk_ssbo);
 	dkMemBlockDestroy(blk_code);
 	dkCmdBufDestroy(cmdbuf);
 	dkMemBlockDestroy(blk_cmdbuf);
+
+	return total_time;
 }
