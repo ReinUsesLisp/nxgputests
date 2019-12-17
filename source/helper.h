@@ -17,6 +17,8 @@
 #define DECLARE_ETEST(id) DEFINE_ETEST(id);
 #define DECLARE_MTEST(id) DEFINE_MTEST(id);
 
+void wait_for_input();
+
 DkMemBlock make_memory_block(DkDevice device, size_t size, uint32_t flags);
 
 bool compare_array(

@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "compute_tests.h"
+#include "helper.h"
 #include "unit_test_report.h"
 
 static int nxlink_socket = -1;
@@ -60,15 +61,8 @@ int main(int argc, char **argv)
 	run_compute_tests(device, queue, report_file, is_automatic);
 	finish_unit_test_report(report_file);
 
-	while (appletMainLoop())
-	{
-		hidScanInput();
-
-		if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_PLUS)
-			break;
-
-		consoleUpdate(NULL);
-	}
+	printf("\nPress A to exit...");
+	wait_for_input();
 
 	dkQueueDestroy(queue);
 	dkDeviceDestroy(device);

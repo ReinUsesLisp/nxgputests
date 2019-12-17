@@ -302,24 +302,6 @@ static bool execute_test(
 	return pass;
 }
 
-static void wait_for_input()
-{
-	printf("Press A to continue...");
-
-	while (true)
-	{
-		hidScanInput();
-
-		if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_A)
-			break;
-
-		consoleUpdate(NULL);
-	}
-
-	printf("\33[2K\r");
-	consoleUpdate(NULL);
-}
-
 void run_compute_tests(
 	DkDevice device, DkQueue queue, FILE* report_file, bool automatic_mode)
 {
@@ -377,6 +359,7 @@ void run_compute_tests(
 		{
 			total_time += armGetSystemTick() - start_time;
 
+			printf("Press A to continue...");
 			wait_for_input();
 
 			start_time = armGetSystemTick();
@@ -386,11 +369,9 @@ void run_compute_tests(
 	total_time += armGetSystemTick() - start_time;
 
 	printf("\n%3d%% tests passed, %zd tests failed out of %zd\n\n"
-		"Total Test time (real) = %.2f sec\n",
+		"Total Test time (real) = %.2f sec\n\n",
 		(int)((NUM_TESTS - failures) * 100 / (float)NUM_TESTS), failures,
 		NUM_TESTS, to_seconds(total_time));
-
-	consoleUpdate(NULL);
 
 	dkMemBlockDestroy(blk_ssbo);
 	dkMemBlockDestroy(blk_code);

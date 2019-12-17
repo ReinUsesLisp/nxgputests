@@ -1,11 +1,28 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <deko3d.h>
 
 #include "unit_test_report.h"
 #include "helper.h"
+
+void wait_for_input()
+{
+	while (true)
+	{
+		hidScanInput();
+
+		if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_A)
+			break;
+
+		consoleUpdate(NULL);
+	}
+
+	printf("\33[2K\r");
+	consoleUpdate(NULL);
+}
 
 DkMemBlock make_memory_block(DkDevice device, size_t size, uint32_t flags)
 {
