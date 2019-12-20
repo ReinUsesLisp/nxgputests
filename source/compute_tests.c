@@ -195,6 +195,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("R2P_IMM.B3 PR",               0x0000dddd, r2p_imm_b3_pr,             8),
 	TEST("P2R_IMM PR",                  0x0000007f, p2r_imm,                   8),
 	TEST("P2R_IMM PR Ra",               0xcccc7bcc, p2r_imm_ra,                8),
+	TEST("P2R_IMM PR Ra Masked",        0xcc48cccc, p2r_imm_ra_masked,         8),
 	TEST("LDS+STS",                     0xa0a0a0a0, shared_memory,             8),
 	TEST("STS Indirect",                0xdeadcafe, sts_indirect,              8),
 	TEST("STS.B64",                     0xddddbbbb, sts_b64,                   8),
