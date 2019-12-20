@@ -69,11 +69,11 @@ int main(int argc, char **argv)
 
 	finish_unit_test_report(report_file);
 
-	dkQueueDestroy(queue);
-	dkDeviceDestroy(device);
-
 	printf("Total Test time (real) = %.2f sec\n\n", to_seconds(total_time));
 
 	printf("\nPress A to exit...");
 	wait_for_input();
+
+	dkQueueDestroy(queue);
+	dkDeviceDestroy(device);
 }
