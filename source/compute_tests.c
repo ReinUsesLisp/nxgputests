@@ -54,6 +54,7 @@ struct compute_test_descriptor
 
 DECLARE_ETEST(sust_p_rgba)
 DECLARE_ETEST(suld_p_rgba)
+DECLARE_ETEST(suld_d_32)
 
 DECLARE_MTEST(shfl_idx)
 DECLARE_MTEST(shfl_up)
@@ -251,6 +252,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
 	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
+	ETEST("SULD.D.32",   0x42960000, suld_d_32,   8),
 
 	MTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
 	MTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
