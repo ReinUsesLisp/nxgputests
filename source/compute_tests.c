@@ -250,6 +250,10 @@ static struct compute_test_descriptor const test_descriptors[] =
 	TEST("SSY & BRK",                   0x0000dddd, ssy_brk,                   8),
 	TEST("LDG.E.CI.U8",                 0x000000f2, ldg_e_ci_u8,               8),
 	TEST("LDG.E.CI.U8 Unaligned",       0x000000f0, ldg_e_ci_u8_unaligned,     8),
+	TEST("LDG.E.CI.U16",                0x0000f0f2, ldg_e_ci_u16,              8),
+	TEST("LDG.E.CI.U16 Unaligned",      0x0000fafe, ldg_e_ci_u16_unaligned,    8),
+	TEST("STG.E.U8",                    0xcccccccc, stg_e_u8,                  8),
+	TEST("STG.E.U16",                   0xabcdabcd, stg_e_u16,                 8),
 
 	ETEST("SUST.P.RGBA", 0x40f00000, sust_p_rgba, 8),
 	ETEST("SULD.P.RGBA", 0x42140000, suld_p_rgba, 8),
