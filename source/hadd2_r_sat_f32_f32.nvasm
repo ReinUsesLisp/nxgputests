@@ -1,12 +1,7 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		mov32i $r4 0x44000000 0xf
-
-		sched (st 0) (st 0) (st 0)
-		mov32i $r3 0x3f800000 0xf
-		hadd2 ftz sat $r2 f32 $r3 f32 $r4
-		stg e b32 ncg[$r0] $r2
-
-		sched (st 0) (st 0) (st 0)
-		exit
+		MOV R0, c[0x0][0x140];
+		MOV R1, c[0x0][0x144];
+		MOV32I R4, 0x44000000;
+		MOV32I R3, 0x3f800000;
+		HADD2.FTZ.SAT R2, R3.F32, R4.F32;
+		STG.E [R0], R2;
+		EXIT;

@@ -1,17 +1,10 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		mov32i $r2 0x3f800000 0xf
-
-		sched (st 0) (st 0) (st 0)
-		mov32i $r3 0xc400c000 0xf
-		hsetp2 le ftz and $p0 $p1 $r2 abs $r3 $p7
-		mov32i $r2 0 0xf
-
-		sched (st 0) (st 0) (st 0)
-	$p0	iadd $r2 $r2 0x00010000
-	$p1	iadd $r2 $r2 0x00000008
-		stg e b32 ncg[$r0] $r2
-
-		sched (st 0) (st 0) (st 0)
-		exit
+		MOV R0, c[0x0][0x140];
+		MOV R1, c[0x0][0x144];
+		MOV32I R2, 0x3f800000;
+		MOV32I R3, 0xc400c000;
+		HSETP2.LE.FTZ.AND P0, P1, R2, |R3|, PT;
+		MOV32I R2, 0;
+ @P0	IADD R2, R2, 0x00010000;
+ @P1	IADD R2, R2, 0x00000008;
+		STG.E [R0], R2;
+		EXIT;

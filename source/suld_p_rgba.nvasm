@@ -1,19 +1,10 @@
-		sched (st 0) (st 0) (st 0)
-		mov32i $r4 0 0xf
-		mov32i $r5 0 0xf
-		suld p t2d rgba ign $r0 g[$r4] 0x48
-
-		sched (st 0) (st 0) (st 0)
-		fadd $r0 $r0 $r1
-		fadd $r0 $r0 $r2
-		fadd $r0 $r0 $r3
-
-		sched (st 0) (st 0) (st 0)
-		mov $r4 c0[0x140] 0xf
-		mov $r5 c0[0x144] 0xf
-		stg e b32 ncg[$r4] $r0
-
-		sched (st 0) (st 0) (st 0)
-		exit
-		nop 0
-		nop 0
+		MOV R4, RZ;
+		MOV R5, RZ;
+		SULD.P.2D.RGBA.IGN R0, [R4], 0x48;
+		FADD R0, R0, R1;
+		FADD R0, R0, R2;
+		FADD R0, R0, R3;
+		MOV R4, c[0x0][0x140];
+		MOV R5, c[0x0][0x144];
+		STG.E [R4], R0;
+		EXIT;

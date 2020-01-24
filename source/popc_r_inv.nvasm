@@ -1,9 +1,6 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		mov32i $r2 0xad8e9a03 0xf
-
-		sched (st 0) (st 0) (st 0)
-		popc $r2 inv $r2
-		stg e b32 ncg[$r0] $r2
-		exit
+		MOV R0, c[0x0][0x140];
+		MOV R1, c[0x0][0x144];
+		MOV32I R2, 0xad8e9a03;
+		POPC R2, ~R2;
+		STG.E [R0], R2;
+		EXIT;

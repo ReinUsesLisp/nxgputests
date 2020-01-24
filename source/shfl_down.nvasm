@@ -1,14 +1,7 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r3 $tidx
-		shfl down $p0 $r2 $r3 2 0x181f
-not $p0 mov32i $r2 0xdead 0xf
-
-		sched (st 0) (st 0) (st 0)
-		iscadd cc $r0 $r3 c0[0x140] 2
-		iadd x $r1 0 c0[0x144]
-		stg e b32 ncg[$r0] $r2
-
-		sched (st 0) (st 0) (st 0)
-		exit
-		nop 0
-		nop 0
+		S2R R3, SR_TID.X;
+		SHFL.DOWN P0, R2, R3, 0x2, 0x181f;
+@!P0    MOV32I R2, 0xdead;
+		ISCADD R0.CC, R3, c[0x0][0x140], 0x2;
+		IADD.X R1, RZ, c[0x0][0x144];
+		STG.E [R0], R2;
+		EXIT;

@@ -1,9 +1,0 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		mov32i $r3 0xbc004200 0xf
-
-		sched (st 0) (st 0) (st 0)
-		hadd2 ftz $r2 $r3 0x4c00 0x3c00
-		stg e b32 ncg[$r0] $r2
-		exit

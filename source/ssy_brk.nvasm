@@ -1,19 +1,11 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		ssy 0x58
-
-		sched (st 0) (st 0) (st 0)
-		pbk 0x68
-		mov32i $r2 0xaaaa 0xf
-		sync
-
-		sched (st 0) (st 0) (st 0)
-		mov32i $r2 0xbbbb 0xf
-		brk
-		mov32i $r2 0xdddd 0xf
-
-		sched (st 0) (st 0) (st 0)
-		stg e b32 ncg[$r0] $r2
-		exit
-		nop 0
+		MOV R0, c[0x0][0x140];
+		MOV R1, c[0x0][0x144];
+		SSY 0x58;
+		PBK 0x68;
+		MOV32I R2, 0xaaaa;
+		SYNC;
+		MOV32I R2, 0xbbbb;
+		BRK;
+		MOV32I R2, 0xdddd;
+		STG.E [R0], R2;
+		EXIT;

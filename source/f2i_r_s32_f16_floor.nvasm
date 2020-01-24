@@ -1,9 +1,6 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		mov32i $r2 0xc033c033 0xf
-
-		sched (st 0) (st 0) (st 0)
-		f2i ftz s32 f16 floor $r2 h1 $r2
-		stg e b32 ncg[$r0] $r2
-		exit
+		MOV R0, c[0x0][0x140];
+		MOV R1, c[0x0][0x144];
+		MOV32I R2, 0xc033c033;
+		F2I.FTZ.S32.F16.FLOOR R2, R2.H1;
+		STG.E [R0], R2;
+		EXIT;

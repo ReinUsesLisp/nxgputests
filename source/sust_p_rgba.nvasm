@@ -1,14 +1,8 @@
-		sched (st 0) (st 0) (st 0)
-		mov32i $r0 0x40f00000 0xf
-		mov32i $r1 0x40f00000 0xf
-		mov32i $r2 0x40f00000 0xf
-
-		sched (st 0) (st 0) (st 0)
-		mov32i $r3 0x40f00000 0xf
-		mov32i $r4 0 0xf
-		mov32i $r5 0 0xf
-
-		sched (st 0) (st 0) (st 0)
-		sust p t2d rgba ign g[$r4] $r0 0x48
-		exit
-		nop 0
+		MOV32I R0, 0x40f00000;
+		MOV32I R1, 0x40f00000;
+		MOV32I R2, 0x40f00000;
+		MOV32I R3, 0x40f00000;
+		MOV32I R4, 0;
+		MOV32I R5, 0;
+		SUST.P.2D.RGBA.IGN [R4], R0, 0x48;
+		EXIT;

@@ -1,14 +1,7 @@
-		sched (st 0) (st 0) (st 0)
-		mov $r0 c0[0x140] 0xf
-		mov $r1 c0[0x144] 0xf
-		mov32i $r2 0xa0a0a0a0 0xf
-
-		sched (st 0) (st 0) (st 0)
-		st b32 s[0] $r2
-		ld b32 $r3 s[0]
-		stg e b32 ncg[$r0] $r3
-
-		sched (st 0) (st 0) (st 0)
-		exit
-		nop 0
-		nop 0
+		MOV R0, c[0x0][0x140];
+		MOV R1, c[0x0][0x144];
+		MOV32I R2, 0xa0a0a0a0;
+		STS [0x0], R2;
+		LDS R3, [0x0];
+		STG.E [R0], R3;
+		EXIT;

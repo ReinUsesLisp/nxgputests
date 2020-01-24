@@ -18,25 +18,27 @@ void userAppInit()
 	(void)nxlink_socket;
 
 	consoleInit(NULL);
-
+/*
 	if (R_FAILED(socketInitializeDefault()))
 		return;
 
 	nxlink_socket = nxlinkStdio();
 	if (nxlink_socket < 0)
 		socketExit();
+*/
 }
 
 void userAppExit()
 {
 	consoleExit(NULL);
-
+/*
 	if (nxlink_socket < 0)
 		return;
 
 	close(nxlink_socket);
 	socketExit();
 	nxlink_socket = -1;
+*/
 }
 
 static float to_seconds(u64 time)
