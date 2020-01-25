@@ -1,9 +1,9 @@
-		MOV R4, c[0x0][0x140];
-		MOV R5, c[0x0][0x144];
-		MOV32I R0, 0x9a78ab42;
-		MOV32I R1, 0x81509abe;
-		MOV32I R2, 0x8ab4fe20;
-		MOV32I R3, 0xa32b8530;
-		XMAD.CBCC R0, R1, R2, R3;
-		STG.E [R4], R0;
-		EXIT;
+        MOV R4, c[0x0][0x140];
+        MOV R5, c[0x0][0x144];
+        MOV32I R0, 0x9a78ab42;
+        MOV32I R1, 0x81509abe;
+        MOV32I R2, 0x8ab4fe20;
+        MOV32I R3, 0xa32b8530;
+        XMAD.CBCC R0, R1, R2, R3;
+        STG.E [R4], R0;
+        EXIT;

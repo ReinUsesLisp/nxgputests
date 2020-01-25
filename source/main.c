@@ -15,29 +15,29 @@ static int nxlink_socket = -1;
 
 void userAppInit()
 {
-	(void)nxlink_socket;
+    (void)nxlink_socket;
 
-	consoleInit(NULL);
+    consoleInit(NULL);
 /*
-	if (R_FAILED(socketInitializeDefault()))
-		return;
+    if (R_FAILED(socketInitializeDefault()))
+        return;
 
-	nxlink_socket = nxlinkStdio();
-	if (nxlink_socket < 0)
-		socketExit();
+    nxlink_socket = nxlinkStdio();
+    if (nxlink_socket < 0)
+        socketExit();
 */
 }
 
 void userAppExit()
 {
-	consoleExit(NULL);
+    consoleExit(NULL);
 /*
-	if (nxlink_socket < 0)
-		return;
+    if (nxlink_socket < 0)
+        return;
 
-	close(nxlink_socket);
-	socketExit();
-	nxlink_socket = -1;
+    close(nxlink_socket);
+    socketExit();
+    nxlink_socket = -1;
 */
 }
 
@@ -48,34 +48,34 @@ static float to_seconds(u64 time)
 
 int main(int argc, char **argv)
 {
-	// TODO: Do proper parsing
-	bool is_automatic = false;
-	if (argc > 1)
-	{
-		if (0 == strcmp(argv[1], "--automatic"))
-			is_automatic = true;
-	}
+    // TODO: Do proper parsing
+    bool is_automatic = false;
+    if (argc > 1)
+    {
+        if (0 == strcmp(argv[1], "--automatic"))
+            is_automatic = true;
+    }
 
-	DkDeviceMaker device_mk;
-	dkDeviceMakerDefaults(&device_mk);
-	DkDevice device = dkDeviceCreate(&device_mk);
+    DkDeviceMaker device_mk;
+    dkDeviceMakerDefaults(&device_mk);
+    DkDevice device = dkDeviceCreate(&device_mk);
 
-	DkQueueMaker queue_mk;
-	dkQueueMakerDefaults(&queue_mk, device);
-	DkQueue queue = dkQueueCreate(&queue_mk);
+    DkQueueMaker queue_mk;
+    dkQueueMakerDefaults(&queue_mk, device);
+    DkQueue queue = dkQueueCreate(&queue_mk);
 
-	u64 total_time = 0;
-	FILE* report_file = begin_unit_test_report();
+    u64 total_time = 0;
+    FILE* report_file = begin_unit_test_report();
 
-	total_time += run_compute_tests(device, queue, report_file, is_automatic);
+    total_time += run_compute_tests(device, queue, report_file, is_automatic);
 
-	finish_unit_test_report(report_file);
+    finish_unit_test_report(report_file);
 
-	printf("Total Test time (real) = %.2f sec\n\n", to_seconds(total_time));
+    printf("Total Test time (real) = %.2f sec\n\n", to_seconds(total_time));
 
-	printf("\nPress A to exit...");
-	wait_for_input();
+    printf("\nPress A to exit...");
+    wait_for_input();
 
-	dkQueueDestroy(queue);
-	dkDeviceDestroy(device);
+    dkQueueDestroy(queue);
+    dkDeviceDestroy(device);
 }

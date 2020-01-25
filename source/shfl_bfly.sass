@@ -1,7 +1,7 @@
-		S2R R3, SR_TID.X;
-		SHFL.BFLY P0, R2, R3, 0x3, 0x1f;
+        S2R R3, SR_TID.X;
+        SHFL.BFLY P0, R2, R3, 0x3, 0x1f;
 @!P0    MOV32I R2, 0xdead;
-		ISCADD R0.CC, R3, c[0x0][0x140], 0x2;
-		IADD.X R1, RZ, c[0x0][0x144];
-		STG.E [R0], R2;
-		EXIT;
+        ISCADD R0.CC, R3, c[0x0][0x140], 0x2;
+        IADD.X R1, RZ, c[0x0][0x144];
+        STG.E [R0], R2;
+        EXIT;
