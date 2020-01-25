@@ -16,7 +16,7 @@
 
 #define TEST(name, expected, id, num_gprs)                          \
     { name, expected, &id##_sass_bin_size, id##_sass_bin, num_gprs, \
-      .shared_mem_size = 512 }
+      .shared_mem_size = 512, .local_mem_size = 16 }
 
 #define ETEST(name, expected, id, num_gprs)                         \
     { name, expected, &id##_sass_bin_size, id##_sass_bin, num_gprs, \
@@ -199,6 +199,10 @@ static struct compute_test_descriptor const test_descriptors[] =
     TEST("STS.B64",                     0xddddbbbb, sts_b64,                   8),
     TEST("STS.B128",                    0xddccbbaa, sts_b128,                  8),
     TEST("LDS Indirect",                0xcafedead, lds_indirect,              8),
+    TEST("STL.S16",                     0x0000cafe, stl_s16,                   8),
+    TEST("STL.S16 Unaligned",           0xcafe0000, stl_s16_unaligned,         8),
+    TEST("LDL.S16",                     0xfffff000, ldl_s16,                   8),
+    TEST("LDL.S16 Unaligned",           0xfffff005, ldl_s16_unaligned,         8),
     TEST("ATOMS.ADD.U32",               0x00000060, atoms_u32_add,             8),
     TEST("ATOMS.MIN.U32",               0x00000040, atoms_u32_min,             8),
     TEST("ATOMS.MAX.U32",               0x90000000, atoms_u32_max,             8),

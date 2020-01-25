@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 
     DkQueueMaker queue_mk;
     dkQueueMakerDefaults(&queue_mk, device);
+    queue_mk.perWarpScratchMemorySize = 8 * DK_PER_WARP_SCRATCH_MEM_ALIGNMENT;
     DkQueue queue = dkQueueCreate(&queue_mk);
 
     u64 total_time = 0;
