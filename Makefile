@@ -86,7 +86,7 @@ export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-NVASMFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.nvasm)))
+SASSFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.sass)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
@@ -103,15 +103,15 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) $(NVASMFILES:.nvasm=.nvbin.o)
+export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) $(SASSFILES:.sass=.sass.bin.o)
 export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
-export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES))) $(NVASMFILES:.nvasm=_nvbin.h)
+export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES))) $(SASSFILES:.sass=_sass_bin.h)
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 			-I$(CURDIR)/$(BUILD) \
-			-include switch.h $(addprefix -include ,$(HFILES_BIN))
+			$(addprefix -include ,$(HFILES_BIN))
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
@@ -223,10 +223,17 @@ $(OFILES_SRC)	: $(HFILES_BIN)
 endif
 #---------------------------------------------------------------------------------
 
-%.nvbin:	%.nvasm
-	@nxas $< -o $@
-	@echo assembled ... $(notdir $@)
+define shader-as
+	$(eval CURBIN := $(notdir $(1:.sass=.sass.bin)))
+	$(eval DEPSFILE := $(DEPSDIR)/$(CURBIN).d)
+	echo "$(CURBIN).o: $1" > $(DEPSFILE)
+	echo "extern const unsigned char" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"_end[];" > `(echo $(CURBIN) | tr . _)`.h
+	echo "extern const unsigned char" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"[];" >> `(echo $(CURBIN) | tr . _)`.h
+	echo "extern const unsigned int" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`_size";" >> `(echo $(CURBIN) | tr . _)`.h
+	@nxas $1 -o $(CURBIN)
+	bin2s $(CURBIN) | $(AS) -o $(CURBIN).o
+	echo assembled ... $(notdir $<)
+endef
 
-%.nvbin.o %_nvbin.h	:	%.nvbin
-	@echo $(notdir $<)
-	@$(bin2o)
+%.sass.bin.o %_sass.h:	%.sass
+	@$(call shader-as,$<)

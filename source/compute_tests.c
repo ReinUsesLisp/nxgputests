@@ -14,20 +14,20 @@
 #define CODEMEM_SIZE (512 * 1024)
 #define SSBO_SIZE (DK_MEMBLOCK_ALIGNMENT)
 
-#define TEST(name, expected, id, num_gprs)                    \
-	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs, \
+#define TEST(name, expected, id, num_gprs)                          \
+	{ name, expected, &id##_sass_bin_size, id##_sass_bin, num_gprs, \
 	  .shared_mem_size = 512 }
 
-#define ETEST(name, expected, id, num_gprs)                   \
-	{ name, expected, &id##_nvbin_size, id##_nvbin, num_gprs, \
+#define ETEST(name, expected, id, num_gprs)                         \
+	{ name, expected, &id##_sass_bin_size, id##_sass_bin, num_gprs, \
 	  execute_test_##id }
 
-#define MTEST(name, id, num_gprs, workgroup_x, workgroup_y, workgroup_z, \
-	num_invokes_x, num_invokes_y, num_invokes_z, local_mem_size,         \
-	shared_mem_size, num_barriers)                                       \
-	{ name, 0, &id##_nvbin_size, id##_nvbin, num_gprs, NULL, test_##id,  \
-	  (workgroup_x) - 1, (workgroup_y) - 1, (workgroup_z) - 1,           \
-	  (num_invokes_x) - 1, (num_invokes_y) - 1, (num_invokes_z) - 1,     \
+#define MTEST(name, id, num_gprs, workgroup_x, workgroup_y, workgroup_z,  \
+	num_invokes_x, num_invokes_y, num_invokes_z, local_mem_size,          \
+	shared_mem_size, num_barriers)                                        \
+	{ name, 0, &id##_sass_bin_size, id##_sass_bin, num_gprs, NULL,        \
+	  test_##id, (workgroup_x) - 1, (workgroup_y) - 1, (workgroup_z) - 1, \
+	  (num_invokes_x) - 1, (num_invokes_y) - 1, (num_invokes_z) - 1,      \
 	  local_mem_size, shared_mem_size, num_barriers }
 
 struct compute_test_descriptor

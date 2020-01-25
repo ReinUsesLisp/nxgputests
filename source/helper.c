@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <switch.h>
 #include <deko3d.h>
 
 #include "unit_test_report.h"
