@@ -1,0 +1,8 @@
+        MOV R0, c[0x0][0x140];
+        MOV R1, c[0x0][0x144];
+        MOV32I R3, 0x80000000;
+        MOV32I R4, 40;
+        MOV32I R5, 0x9de0b544;
+        SHF.R.W R2, R3, R4, R5;
+        STG.E [R0], R2;
+        EXIT;
