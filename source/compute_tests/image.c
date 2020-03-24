@@ -74,8 +74,8 @@ static struct image* make_image(DkDevice device, DkImageDescriptor* descriptor,
         .pImage = &obj->image,
         .type = type,
         .format = format,
-        .swizzle =
-            {DkSwizzle_Red, DkSwizzle_Green, DkSwizzle_Blue, DkSwizzle_Alpha},
+        .swizzle = {DkImageSwizzle_Red, DkImageSwizzle_Green,
+                    DkImageSwizzle_Blue, DkImageSwizzle_Alpha},
     };
     dkImageDescriptorInitialize(descriptor, &image_view, true, false);
 

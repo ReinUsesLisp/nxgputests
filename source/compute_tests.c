@@ -309,12 +309,13 @@ static bool execute_test(
         test->shared_mem_size, test->num_barriers);
 
     DkShader shader;
+    DkShader const* shaders = &shader;
     DkShaderMaker shader_mk;
     dkShaderMakerDefaults(&shader_mk, blk_code, 0);
     dkShaderInitialize(&shader, &shader_mk);
 
     dkCmdBufClear(cmdbuf);
-    dkCmdBufBindShader(cmdbuf, &shader);
+    dkCmdBufBindShaders(cmdbuf, DkStageFlag_Compute, &shaders, 1);
 
     if (test->execute)
     {
