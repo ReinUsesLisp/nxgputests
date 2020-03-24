@@ -146,9 +146,16 @@ DEFINE_ETEST(suld_p_rgba)
         DkImageFormat_R32_Float, 1, 1, 1, 32, write_1x1, &data);
 }
 
-DEFINE_ETEST(suld_d_32)
+DEFINE_ETEST(suld_d_32_r32f)
 {
     float const data = 75.0f;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
         DkImageFormat_R32_Float, 1, 1, 1, 32, write_1x1, &data);
+}
+
+DEFINE_ETEST(suld_d_32_rgba8)
+{
+    uint32_t const data = 0x20406080;
+    simple_image_test(device, queue, cmdbuf, DkImageType_2D,
+        DkImageFormat_RGBX8_Unorm, 1, 1, 1, 24, write_1x1, &data);
 }
