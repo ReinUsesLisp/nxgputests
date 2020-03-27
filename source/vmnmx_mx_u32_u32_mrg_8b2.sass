@@ -1,0 +1,8 @@
+        MOV R0, c[0x0][0x140];
+        MOV R1, c[0x0][0x144];
+        MOV32I R2, 0x0000004c;
+        MOV32I R3, 0x00008012;
+        MOV32I R4, 0xaabbccdd;
+        VMNMX.U32.U32.MX.MRG_8B2 R2, R2, R3, R4;
+        STG.E [R0], R2;
+        EXIT;
