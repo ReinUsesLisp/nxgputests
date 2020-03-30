@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
 
+#include <switch.h>
 #include <deko3d.h>
 
 u64 run_compute_tests(
