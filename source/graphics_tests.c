@@ -36,7 +36,7 @@ struct gfx_test_descriptor
     dkQueueWaitIdle(ctx->queue);                                   \
     return render_target_memblock;
 
-DEFINE_TEST(clear_test)
+DEFINE_TEST(clear)
 {
     BASIC_INIT(DkImageFormat_RGBA8_Unorm)
 
@@ -46,9 +46,26 @@ DEFINE_TEST(clear_test)
     BASIC_END
 }
 
+DEFINE_TEST(clear_scissor)
+{
+    BASIC_INIT(DkImageFormat_RGBA32_Float)
+
+    static float const background_color[4] = {0.13f, 0.54f, 65.2f, -3.5f};
+    static float const scissor_color[4] = {102.4f, 0.0f, -43.2f, 8.13f};
+    static DkScissor const scissor = {13, 17, 23, 45};
+    static DkScissor const default_scissor = {0, 0, 65535, 65535};
+    dkCmdBufClearColor(cmdbuf, 0, DkColorMask_RGBA, background_color);
+    dkCmdBufSetScissors(cmdbuf, 0, &scissor, 1);
+    dkCmdBufClearColor(cmdbuf, 0, DkColorMask_RGBA, scissor_color);
+    dkCmdBufSetScissors(cmdbuf, 0, &default_scissor, 1);
+
+    BASIC_END
+}
+
 static struct gfx_test_descriptor test_descriptors[] =
 {
-    TEST(clear_test, 0xbe7e7dc089ef7f01),
+    TEST(clear_test,         0xbe7e7dc089ef7f01),
+    TEST(clear_test_scissor, 0x4a692c884d6338ac),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 

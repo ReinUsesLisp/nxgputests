@@ -12,6 +12,8 @@ static int bpp(DkImageFormat format)
 	{
 	case DkImageFormat_RGBA8_Unorm:
 		return 4;
+	case DkImageFormat_RGBA32_Float:
+		return 16;
 	default:
 		assert(false);
 		return 1;
