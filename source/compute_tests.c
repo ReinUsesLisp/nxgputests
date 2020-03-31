@@ -7,7 +7,6 @@
 
 #include "compute_tests.h"
 #include "dksh_gen.h"
-#include "unit_test_report.h"
 #include "helper.h"
 
 #define CMDMEM_SIZE (3 * DK_MEMBLOCK_ALIGNMENT)
@@ -40,7 +39,7 @@ struct compute_test_descriptor
     uint8_t num_gprs;
 
     void (*execute)(DkDevice, DkQueue, DkCmdBuf, uint32_t* results);
-    bool (*check_results)(char const*, uint32_t*, FILE*);
+    bool (*check_results)(uint32_t*);
     uint8_t workgroup_x_minus_1;
     uint8_t workgroup_y_minus_1;
     uint8_t workgroup_z_minus_1;
@@ -335,7 +334,7 @@ static struct compute_test_descriptor const test_descriptors[] =
 static bool execute_test(
     struct compute_test_descriptor const* test, DkDevice device,
     DkQueue queue, DkMemBlock blk_code, uint8_t* code, DkCmdBuf cmdbuf,
-    uint32_t* results, FILE* report_file)
+    uint32_t* results)
 {
     generate_compute_dksh(code, *test->code_size, test->code, test->num_gprs,
         test->workgroup_x_minus_1 + 1, test->workgroup_y_minus_1 + 1,
@@ -365,19 +364,19 @@ static bool execute_test(
     }
 
     if (test->check_results)
-        return test->check_results(test->name, results, report_file);
+    {
+        return test->check_results(results);
+    }
 
-    bool pass = results[0] == test->expected_value;
-    if (!pass)
+    if (results[0] != test->expected_value)
+    {
         printf("exp %08x got %08x ", test->expected_value, *(uint32_t*)results);
-
-    unit_test_report(report_file, test->name, pass, 1, &test->expected_value,
-        results);
-    return pass;
+        return false;
+    }
+    return true;
 }
 
-void run_compute_tests(
-    DkDevice device, DkQueue queue, FILE* report_file, bool automatic_mode)
+void run_compute_tests(DkDevice device, DkQueue queue, bool automatic_mode)
 {
     DkMemBlock blk_cmdbuf = make_memory_block(device, CMDMEM_SIZE,
         DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached);
@@ -418,8 +417,8 @@ void run_compute_tests(
 
         consoleUpdate(NULL);
 
-        bool pass = execute_test(test, device, queue, blk_code, code_data,
-            cmdbuf, ssbo_data, report_file);
+        bool pass = execute_test(
+            test, device, queue, blk_code, code_data, cmdbuf, ssbo_data);
         if (!pass)
             ++failures;
         puts(pass ? "Passed" : "Failed");

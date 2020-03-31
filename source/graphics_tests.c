@@ -47,8 +47,7 @@ static struct gfx_test_descriptor test_descriptors[] =
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
-void run_graphics_tests(
-    DkDevice device, DkQueue queue, FILE* report_file, bool automatic_mode)
+void run_graphics_tests(DkDevice device, DkQueue queue, bool automatic_mode)
 {
 	struct gfx_context ctx = {0};
 	ctx.device = device;
