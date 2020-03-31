@@ -55,7 +55,13 @@ struct compute_test_descriptor
 DECLARE_ETEST(sust_p_rgba)
 DECLARE_ETEST(suld_p_rgba)
 DECLARE_ETEST(suld_d_32_r32f)
-DECLARE_ETEST(suld_d_32_rgba8)
+DECLARE_ETEST(suld_d_32_rgba8u)
+DECLARE_ETEST(suld_d_32_rgba8s)
+DECLARE_ETEST(suld_d_32_rgba8ui)
+DECLARE_ETEST(suld_d_32_rgba8i)
+DECLARE_ETEST(suld_d_64_rg32f)
+DECLARE_ETEST(suld_d_64_rgba16f)
+DECLARE_ETEST(suld_d_64_rgba16s)
 
 DECLARE_MTEST(shfl_idx)
 DECLARE_MTEST(shfl_up)
@@ -307,11 +313,16 @@ static struct compute_test_descriptor const test_descriptors[] =
     TEST("STG.E.U16",                   0xabcdabcd, stg_e_u16,                 8),
     TEST("ATOM.E.ADD.S32",              0x2468c2ef, atom_add_s32,              8),
 
-    // Temporarily disabled due to crashes
-    // ETEST("SUST.P.RGBA",     0x40f00000, sust_p_rgba,     8),
-    // ETEST("SULD.P.RGBA",     0x42140000, suld_p_rgba,     8),
-    // ETEST("SULD.D.32 R32F",  0x42960000, suld_d_32_r32f,  8),
-    // ETEST("SULD.D.32 RGBA8", 0x20406080, suld_d_32_rgba8, 8),
+    ETEST("SUST.P.RGBA",        0x40f00000, sust_p_rgba,       8),
+    ETEST("SULD.P.RGBA",        0x42140000, suld_p_rgba,       8),
+    ETEST("SULD.D.32 R32F",     0x42960000, suld_d_32_r32f,    8),
+    ETEST("SULD.D.32 RGBA8U",   0x20406080, suld_d_32_rgba8u,  8),
+    ETEST("SULD.D.32 RGBA8S",   0x65fe12ff, suld_d_32_rgba8s,  8),
+    ETEST("SULD.D.32 RGBA8UI",  0xdeadbeec, suld_d_32_rgba8ui, 8),
+    ETEST("SULD.D.32 RGBA8I",   0x11a220ff, suld_d_32_rgba8i,  8),
+    ETEST("SULD.D.64 RG32F",    0x377a5a7f, suld_d_64_rg32f,   8),
+    ETEST("SULD.D.64 RGBA16F",  0x44446666, suld_d_64_rgba16f, 8),
+    ETEST("SULD.D.64 RGBA16S",  0xa11fc428, suld_d_64_rgba16s, 8),
 
     MTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
     MTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
