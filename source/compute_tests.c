@@ -376,7 +376,7 @@ static bool execute_test(
     return pass;
 }
 
-u64 run_compute_tests(
+void run_compute_tests(
     DkDevice device, DkQueue queue, FILE* report_file, bool automatic_mode)
 {
     DkMemBlock blk_cmdbuf = make_memory_block(device, CMDMEM_SIZE,
@@ -405,9 +405,6 @@ u64 run_compute_tests(
 
     printf("Running compute tests...\n\n");
 
-    u64 start_time = armGetSystemTick();
-    u64 total_time = 0;
-
     size_t failures = 0;
     for (size_t i = 0; i < NUM_TESTS; ++i)
     {
@@ -431,16 +428,10 @@ u64 run_compute_tests(
 
         if (!automatic_mode && i != 0 && i % 43 == 0)
         {
-            total_time += armGetSystemTick() - start_time;
-
             printf("Press A to continue...");
             wait_for_input();
-
-            start_time = armGetSystemTick();
         }
     }
-
-    total_time += armGetSystemTick() - start_time;
 
     printf("\n%3d%% tests passed, %zd tests failed out of %zd\n\n",
         (int)((NUM_TESTS - failures) * 100 / (float)NUM_TESTS), failures,
@@ -450,6 +441,4 @@ u64 run_compute_tests(
     dkMemBlockDestroy(blk_code);
     dkCmdBufDestroy(cmdbuf);
     dkMemBlockDestroy(blk_cmdbuf);
-
-    return total_time;
 }

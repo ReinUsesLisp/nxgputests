@@ -34,3 +34,11 @@ struct sha256_hash hash_memblock(DkMemBlock memblock)
     sha256CalculateHash(&hash, data, size);
     return hash;
 }
+
+bool compare_hash(DkMemBlock memblock, u64 v1, u64 v2, u64 v3, u64 v4)
+{
+    u64 const expected[] = {v1, v2, v3, v4};
+
+    struct sha256_hash hash = hash_memblock(memblock);
+    return memcmp(&hash, expected, sizeof(hash)) == 0;
+}
