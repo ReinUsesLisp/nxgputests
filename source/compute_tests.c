@@ -55,6 +55,7 @@ DECLARE_ETEST(sust_p_rgba)
 DECLARE_ETEST(suld_p_rgba)
 DECLARE_ETEST(suld_d_32_r32f)
 DECLARE_ETEST(suld_d_32_rgba8u)
+DECLARE_ETEST(suld_d_32_bgra8u)
 DECLARE_ETEST(suld_d_32_rgba8s)
 DECLARE_ETEST(suld_d_32_rgba8ui)
 DECLARE_ETEST(suld_d_32_rgba8i)
@@ -316,6 +317,7 @@ static struct compute_test_descriptor const test_descriptors[] =
     ETEST("SULD.P.RGBA",        0x42140000, suld_p_rgba,       8),
     ETEST("SULD.D.32 R32F",     0x42960000, suld_d_32_r32f,    8),
     ETEST("SULD.D.32 RGBA8U",   0x20406080, suld_d_32_rgba8u,  8),
+    ETEST("SULD.D.32 BGRA8U",   0x21416181, suld_d_32_bgra8u,  8),
     ETEST("SULD.D.32 RGBA8S",   0x65fe12ff, suld_d_32_rgba8s,  8),
     ETEST("SULD.D.32 RGBA8UI",  0xdeadbeec, suld_d_32_rgba8ui, 8),
     ETEST("SULD.D.32 RGBA8I",   0x11a220ff, suld_d_32_rgba8i,  8),

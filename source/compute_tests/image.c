@@ -45,16 +45,15 @@ static void destroy_descriptor_set(struct descriptor_set const* obj)
 
 static struct image* make_image(DkDevice device, DkImageDescriptor* descriptor,
     DkImageType type, DkImageFormat format, uint32_t width, uint32_t height,
-    uint32_t depth, uint32_t stride)
+    uint32_t depth)
 {
     DkImageLayoutMaker layout_maker = {
         .device = device,
         .type = type,
-        .flags = DkImageFlags_PitchLinear | DkImageFlags_UsageLoadStore,
+        .flags = DkImageFlags_UsageLoadStore,
         .format = format,
         .dimensions = {width, height, depth},
         .mipLevels = 1,
-        .pitchStride = stride,
     };
     DkImageLayout layout;
     dkImageLayoutInitialize(&layout, &layout_maker);
@@ -96,12 +95,12 @@ static void destroy_test_image(struct test_image test_image)
 
 static struct test_image image_test(DkDevice device, DkQueue queue,
     DkCmdBuf cmdbuf, uint32_t type, uint32_t format, uint32_t width,
-    uint32_t height, uint32_t depth, uint32_t stride,
+    uint32_t height, uint32_t depth,
     void (*image_writer)(struct image*, void const*), void const *userdata)
 {
     struct descriptor_set set = make_image_descriptor_set(device, 1);
     struct image *image = make_image(device, &set.descriptors[0], type,
-        format, width, height, depth, stride);
+        format, width, height, depth);
 
     if (image_writer)
         image_writer(image, userdata);
@@ -119,11 +118,11 @@ static struct test_image image_test(DkDevice device, DkQueue queue,
 
 static void simple_image_test(DkDevice device, DkQueue queue,
     DkCmdBuf cmdbuf, uint32_t type, uint32_t format, uint32_t width,
-    uint32_t height, uint32_t depth, uint32_t stride,
+    uint32_t height, uint32_t depth,
     void (*image_writer)(struct image*, void const*), void const *userdata)
 {
     destroy_test_image(image_test(device, queue, cmdbuf, type, format, width,
-        height, depth, stride, image_writer, userdata));
+        height, depth, image_writer, userdata));
 }
 
 static void write32(struct image* image, void const* userdata)
@@ -139,7 +138,7 @@ static void write64(struct image* image, void const* userdata)
 DEFINE_ETEST(sust_p_rgba)
 {
     struct test_image image = image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_R32_Float, 1, 1, 1, 4, NULL, NULL);
+        DkImageFormat_R32_Float, 1, 1, 1, NULL, NULL);
     memcpy(results, image.image->memory, sizeof(uint32_t));
     destroy_test_image(image);
 }
@@ -148,61 +147,68 @@ DEFINE_ETEST(suld_p_rgba)
 {
     float const data = 36.0f;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_R32_Float, 1, 1, 1, 4, write32, &data);
+        DkImageFormat_R32_Float, 1, 1, 1, write32, &data);
 }
 
 DEFINE_ETEST(suld_d_32_r32f)
 {
     float const data = 75.0f;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_R32_Float, 1, 1, 1, 4, write32, &data);
+        DkImageFormat_R32_Float, 1, 1, 1, write32, &data);
 }
 
 DEFINE_ETEST(suld_d_32_rgba8u)
 {
     uint32_t const data = 0x20406080;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RGBA8_Unorm, 1, 1, 1, 4, write32, &data);
+        DkImageFormat_RGBA8_Unorm, 1, 1, 1, write32, &data);
+}
+
+DEFINE_ETEST(suld_d_32_bgra8u)
+{
+    uint32_t const data = 0x21416181;
+    simple_image_test(device, queue, cmdbuf, DkImageType_2D,
+        DkImageFormat_BGRA8_Unorm, 1, 1, 1, write32, &data);
 }
 
 DEFINE_ETEST(suld_d_32_rgba8s)
 {
     uint32_t const data = 0x65fe12ff;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RGBA8_Snorm, 1, 1, 1, 4, write32, &data);
+        DkImageFormat_RGBA8_Snorm, 1, 1, 1, write32, &data);
 }
 
 DEFINE_ETEST(suld_d_32_rgba8ui)
 {
     uint32_t const data = 0xdeadbeec;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RGBA8_Uint, 1, 1, 1, 4, write32, &data);
+        DkImageFormat_RGBA8_Uint, 1, 1, 1, write32, &data);
 }
 
 DEFINE_ETEST(suld_d_32_rgba8i)
 {
     uint32_t const data = 0x11a220ff;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RGBA8_Sint, 1, 1, 1, 4, write32, &data);
+        DkImageFormat_RGBA8_Sint, 1, 1, 1, write32, &data);
 }
 
 DEFINE_ETEST(suld_d_64_rg32f)
 {
     uint64_t const data = 0x013275ab32452ffcc;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RG32_Float, 1, 1, 1, 8, write64, &data);
+        DkImageFormat_RG32_Float, 1, 1, 1, write64, &data);
 }
 
 DEFINE_ETEST(suld_d_64_rgba16f)
 {
     uint64_t const data = 0x1111222233334444;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RGBA16_Float, 1, 1, 1, 8, write64, &data);
+        DkImageFormat_RGBA16_Float, 1, 1, 1, write64, &data);
 }
 
 DEFINE_ETEST(suld_d_64_rgba16s)
 {
     uint64_t const data = 0x00ff1365a020b0c3;
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
-        DkImageFormat_RGBA16_Snorm, 1, 1, 1, 8, write64, &data);
+        DkImageFormat_RGBA16_Snorm, 1, 1, 1, write64, &data);
 }
