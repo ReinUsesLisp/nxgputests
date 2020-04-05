@@ -1,0 +1,7 @@
+        MOV R0, c[0x0][0x140];
+        MOV R1, c[0x0][0x144];
+        MOV32I R2, 0x0000bab8;
+        MOV32I R3, 0xdada0001;
+        STG.E [R0], R2;
+        RED.E.ADD [R0], R3;
+        EXIT;
