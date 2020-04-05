@@ -22,14 +22,17 @@ struct gfx_test_descriptor
     u64 expected;
 };
 
-#define BASIC_INIT(format)                                             \
+#define BASIC_INIT(format, is_color)                                   \
     DkImage render_target;                                             \
     DkMemBlock render_target_memblock;                                 \
     make_linear_render_target(                                         \
         ctx, format, 64, 64, &render_target, &render_target_memblock); \
     DkImageView render_target_view = make_image_view(&render_target);  \
     DkCmdBuf cmdbuf = make_cmdbuf(ctx, 1024);                          \
-    dkCmdBufBindRenderTarget(cmdbuf, &render_target_view, NULL);
+    DkImageView const* const color_rt_view[] = {&render_target_view};  \
+    DkImageView* zeta_rt_view = is_color ? NULL : &render_target_view; \
+    dkCmdBufBindRenderTargets(                                         \
+        cmdbuf, color_rt_view, is_color ? 1 : 0, zeta_rt_view);
 
 #define BASIC_END                                                  \
     dkQueueSubmitCommands(ctx->queue, dkCmdBufFinishList(cmdbuf)); \
@@ -38,7 +41,7 @@ struct gfx_test_descriptor
 
 DEFINE_TEST(clear)
 {
-    BASIC_INIT(DkImageFormat_RGBA8_Unorm)
+    BASIC_INIT(DkImageFormat_RGBA8_Unorm, true)
 
     static float const clear_color[4] = {1.0f, 0.8f, 0.25f, 0.125f};
     dkCmdBufClearColor(cmdbuf, 0, DkColorMask_RGBA, clear_color);
@@ -48,7 +51,7 @@ DEFINE_TEST(clear)
 
 DEFINE_TEST(clear_scissor)
 {
-    BASIC_INIT(DkImageFormat_RGBA32_Float)
+    BASIC_INIT(DkImageFormat_RGBA32_Float, true)
 
     static float const background_color[4] = {0.13f, 0.54f, 65.2f, -3.5f};
     static float const scissor_color[4] = {102.4f, 0.0f, -43.2f, 8.13f};
@@ -62,10 +65,51 @@ DEFINE_TEST(clear_scissor)
     BASIC_END
 }
 
+DEFINE_TEST(clear_scissor_masked)
+{
+    BASIC_INIT(DkImageFormat_RGBA32_Float, true)
+
+    static float const background_color[4] = {0.13f, 0.54f, 65.2f, -3.5f};
+    static float const scissor_color[4] = {102.4f, 0.0f, -43.2f, 8.13f};
+    static DkScissor const scissor = {13, 17, 23, 45};
+    static DkScissor const default_scissor = {0, 0, 65535, 65535};
+    dkCmdBufClearColor(cmdbuf, 0, DkColorMask_RGBA, background_color);
+    dkCmdBufSetScissors(cmdbuf, 0, &scissor, 1);
+    dkCmdBufClearColor(cmdbuf, 0, DkColorMask_RGB, scissor_color);
+    dkCmdBufSetScissors(cmdbuf, 0, &default_scissor, 1);
+
+    BASIC_END
+}
+
+DEFINE_TEST(clear_depth)
+{
+    DkImage render_target;
+    DkMemBlock render_target_memblock;
+    make_linear_render_target(
+        ctx, DkImageFormat_ZF32, 64, 64, &render_target, &render_target_memblock);
+    DkImageView render_target_view = make_image_view(&render_target);
+
+    DkCmdBuf cmdbuf = make_cmdbuf(ctx, 1024);
+
+    DkDepthStencilState ds;
+    dkDepthStencilStateDefaults(&ds);
+    ds.depthTestEnable = 0;
+    ds.depthWriteEnable = 0;
+    dkCmdBufBindDepthStencilState(cmdbuf, &ds);
+
+    dkCmdBufBindRenderTargets(cmdbuf, NULL, 0, &render_target_view);
+
+    dkCmdBufClearDepthStencil(cmdbuf, true, 32.15f, 0, 0);
+
+    BASIC_END
+}
+
 static struct gfx_test_descriptor test_descriptors[] =
 {
-    TEST(clear_test,         0xbe7e7dc089ef7f01),
-    TEST(clear_test_scissor, 0x4a692c884d6338ac),
+    TEST(clear,                0xbe7e7dc089ef7f01),
+    TEST(clear_scissor,        0x27750a82ffacde28),
+    TEST(clear_scissor_masked, 0x69292f52fbda15c1),
+    TEST(clear_depth,          0x139f492006278563),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
