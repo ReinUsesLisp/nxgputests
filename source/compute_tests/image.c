@@ -212,3 +212,24 @@ DEFINE_ETEST(suld_d_64_rgba16s)
     simple_image_test(device, queue, cmdbuf, DkImageType_2D,
         DkImageFormat_RGBA16_Snorm, 1, 1, 1, write64, &data);
 }
+
+DEFINE_ETEST(suld_d_64_rgba16u)
+{
+    uint64_t const data = 0xa8943bc24389a234;
+    simple_image_test(device, queue, cmdbuf, DkImageType_2D,
+        DkImageFormat_RGBA16_Unorm, 1, 1, 1, write64, &data);
+}
+
+DEFINE_ETEST(suld_d_64_rgba16i)
+{
+    uint64_t const data = 0xc235abe456630a13;
+    simple_image_test(device, queue, cmdbuf, DkImageType_2D,
+        DkImageFormat_RGBA16_Sint, 1, 1, 1, write64, &data);
+}
+
+DEFINE_ETEST(suld_d_64_rgba16ui)
+{
+    uint64_t const data = 0x157c4deab9432573;
+    simple_image_test(device, queue, cmdbuf, DkImageType_2D,
+        DkImageFormat_RGBA16_Uint, 1, 1, 1, write64, &data);
+}

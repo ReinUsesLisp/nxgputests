@@ -62,6 +62,9 @@ DECLARE_ETEST(suld_d_32_rgba8i)
 DECLARE_ETEST(suld_d_64_rg32f)
 DECLARE_ETEST(suld_d_64_rgba16f)
 DECLARE_ETEST(suld_d_64_rgba16s)
+DECLARE_ETEST(suld_d_64_rgba16u)
+DECLARE_ETEST(suld_d_64_rgba16i)
+DECLARE_ETEST(suld_d_64_rgba16ui)
 
 DECLARE_MTEST(shfl_idx)
 DECLARE_MTEST(shfl_up)
@@ -314,17 +317,20 @@ static struct compute_test_descriptor const test_descriptors[] =
     TEST("ATOM.E.ADD.S32",              0x2468c2ef, atom_add_s32,              8),
     TEST("RED.E.ADD",                   0xdadabab9, red_add,                   8),
 
-    ETEST("SUST.P.RGBA",        0x40f00000, sust_p_rgba,       8),
-    ETEST("SULD.P.RGBA",        0x42140000, suld_p_rgba,       8),
-    ETEST("SULD.D.32 R32F",     0x42960000, suld_d_32_r32f,    8),
-    ETEST("SULD.D.32 RGBA8U",   0x20406080, suld_d_32_rgba8u,  8),
-    ETEST("SULD.D.32 BGRA8U",   0x21416181, suld_d_32_bgra8u,  8),
-    ETEST("SULD.D.32 RGBA8S",   0x65fe12ff, suld_d_32_rgba8s,  8),
-    ETEST("SULD.D.32 RGBA8UI",  0xdeadbeec, suld_d_32_rgba8ui, 8),
-    ETEST("SULD.D.32 RGBA8I",   0x11a220ff, suld_d_32_rgba8i,  8),
-    ETEST("SULD.D.64 RG32F",    0x377a5a7f, suld_d_64_rg32f,   8),
-    ETEST("SULD.D.64 RGBA16F",  0x44446666, suld_d_64_rgba16f, 8),
-    ETEST("SULD.D.64 RGBA16S",  0xa11fc428, suld_d_64_rgba16s, 8),
+    ETEST("SUST.P.RGBA",        0x40f00000, sust_p_rgba,        8),
+    ETEST("SULD.P.RGBA",        0x42140000, suld_p_rgba,        8),
+    ETEST("SULD.D.32 R32F",     0x42960000, suld_d_32_r32f,     8),
+    ETEST("SULD.D.32 RGBA8U",   0x20406080, suld_d_32_rgba8u,   8),
+    ETEST("SULD.D.32 BGRA8U",   0x21416181, suld_d_32_bgra8u,   8),
+    ETEST("SULD.D.32 RGBA8S",   0x65fe12ff, suld_d_32_rgba8s,   8),
+    ETEST("SULD.D.32 RGBA8UI",  0xdeadbeec, suld_d_32_rgba8ui,  8),
+    ETEST("SULD.D.32 RGBA8I",   0x11a220ff, suld_d_32_rgba8i,   8),
+    ETEST("SULD.D.64 RG32F",    0x377a5a7f, suld_d_64_rg32f,    8),
+    ETEST("SULD.D.64 RGBA16F",  0x44446666, suld_d_64_rgba16f,  8),
+    ETEST("SULD.D.64 RGBA16S",  0xa11fc428, suld_d_64_rgba16s,  8),
+    ETEST("SULD.D.64 RGBA16U",  0xec1dddf6, suld_d_64_rgba16u,  8),
+    ETEST("SULD.D.64 RGBA16I",  0x1898b5f7, suld_d_64_rgba16i,  8),
+    ETEST("SULD.D.64 RGBA16UI", 0xcebf735d, suld_d_64_rgba16ui, 8),
 
     MTEST("SHFL.IDX",  shfl_idx,  8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
     MTEST("SHFL.UP",   shfl_up,   8, 8, 1, 1, 1, 1, 1, 0, 0, 0),
