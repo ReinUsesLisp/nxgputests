@@ -1,0 +1,9 @@
+        MOV R0, c[0x0][0x140];
+        MOV R1, c[0x0][0x144];
+        MOV32I R2, 0x3f800000;
+        MOV32I R3, 0x3f800000;
+        FSETP.EQ.FTZ.AND P0, PT, R2, R3, PT;
+@!P0    MOV32I R2, 0xdead;
+ @P0    MOV32I R2, 0xcafe;
+        STG.E [R0], R2;
+        EXIT;
