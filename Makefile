@@ -89,6 +89,8 @@ CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SASSFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.sass)))
+VERTFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.vert)))
+FRAGFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.frag)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
@@ -110,12 +112,14 @@ export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 export OFILES	:=	$(OFILES_BIN) $(OFILES_SRC)
 export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
-export ROMFS_TARGETS	:=	\
-			$(patsubst %.sass, $(CURDIR)/$(ROMFS)/%.sass.bin, $(SASSFILES))
-export ROMFS_DEPS := $(ROMFS_TARGETS)
+export SHADERS_FOLDER	:= $(CURDIR)/$(ROMFS)
+export ROMFS_FOLDERS	:= $(SHADERS_FOLDER)
 
-export SASSBIN_FOLDER	:= $(CURDIR)/$(ROMFS)
-export ROMFS_FOLDERS	:= $(SASSBIN_FOLDER)
+export ROMFS_TARGETS	:=	\
+			$(patsubst %.sass, $(SHADERS_FOLDER)/%.sass.bin, $(SASSFILES)) \
+			$(patsubst %.vert, $(SHADERS_FOLDER)/%.vert.dksh, $(VERTFILES)) \
+			$(patsubst %.frag, $(SHADERS_FOLDER)/%.frag.dksh, $(FRAGFILES))
+export ROMFS_DEPS := $(ROMFS_TARGETS)
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
@@ -236,5 +240,11 @@ $(OFILES_SRC)	: $(HFILES_BIN)
 endif
 #---------------------------------------------------------------------------------
 
-$(SASSBIN_FOLDER)/%.sass.bin:	$(SHADERS)/%.sass
+$(SHADERS_FOLDER)/%.sass.bin:	$(SHADERS)/%.sass
 	nxas $< -o $@
+
+$(SHADERS_FOLDER)/%.vert.dksh: $(SHADERS)/%.vert
+	uam -s vert -o $@ $<
+
+$(SHADERS_FOLDER)/%.frag.dksh: $(SHADERS)/%.frag
+	uam -s frag -o $@ $<

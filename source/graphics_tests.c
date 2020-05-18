@@ -28,11 +28,18 @@ struct gfx_test_descriptor
     make_linear_render_target(                                         \
         ctx, format, 64, 64, &render_target, &render_target_memblock); \
     DkImageView render_target_view = make_image_view(&render_target);  \
-    DkCmdBuf cmdbuf = make_cmdbuf(ctx, 1024);                          \
+    DkCmdBuf const cmdbuf = make_cmdbuf(ctx, 1024);                    \
     DkImageView const* const color_rt_view[] = {&render_target_view};  \
     DkImageView* zeta_rt_view = is_color ? NULL : &render_target_view; \
     dkCmdBufBindRenderTargets(                                         \
         cmdbuf, color_rt_view, is_color ? 1 : 0, zeta_rt_view);
+
+#define BIND_SHADER(type, name) \
+    do {                                                              \
+        DkShader const shader = make_shader(ctx, name);               \
+        DkShader const* const shaders = &shader;                      \
+        dkCmdBufBindShaders(cmdbuf, DkStageFlag_##type, &shaders, 1); \
+    } while (0);
 
 #define BASIC_END                                                  \
     dkQueueSubmitCommands(ctx->queue, dkCmdBufFinishList(cmdbuf)); \
@@ -104,12 +111,25 @@ DEFINE_TEST(clear_depth)
     BASIC_END
 }
 
+DEFINE_TEST(basic_draw)
+{
+    BASIC_INIT(DkImageFormat_RGBA32_Float, true)
+
+    BIND_SHADER(Vertex, "full_screen_tri.vert")
+    BIND_SHADER(Fragment, "red.frag")
+
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
+
+    BASIC_END
+}
+
 static struct gfx_test_descriptor test_descriptors[] =
 {
     TEST(clear,                0xbe7e7dc089ef7f01),
     TEST(clear_scissor,        0x27750a82ffacde28),
     TEST(clear_scissor_masked, 0x69292f52fbda15c1),
     TEST(clear_depth,          0x139f492006278563),
+    TEST(basic_draw,           0x1137a01933ff0447),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
