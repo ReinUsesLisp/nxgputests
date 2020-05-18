@@ -45,6 +45,11 @@ void userAppExit()
 
 int main(int argc, char **argv)
 {
+    // Init romfs before doing anything
+    Result rc = romfsInit();
+    if (R_FAILED(rc))
+        printf("romfsInit: %08X\n", rc);
+
     // TODO: Do proper parsing
     bool is_automatic = false;
     if (argc > 1)

@@ -42,6 +42,7 @@ BUILD		:=	build
 SOURCES		:=	source source/compute_tests
 DATA		:=	data
 INCLUDES	:=	source
+ROMFS		:=	$(BUILD)/romfs
 NO_NACP		:=	yes
 
 #---------------------------------------------------------------------------------
@@ -103,15 +104,21 @@ else
 endif
 #---------------------------------------------------------------------------------
 
-export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) $(SASSFILES:.sass=.sass.bin.o)
+export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
 export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
-export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
-export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES))) $(SASSFILES:.sass=_sass_bin.h)
+export OFILES	:=	$(OFILES_BIN) $(OFILES_SRC)
+export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
+
+export ROMFS_TARGETS	:=	\
+			$(patsubst %.sass, $(CURDIR)/$(ROMFS)/%.sass.bin, $(SASSFILES))
+export ROMFS_DEPS := $(ROMFS_TARGETS)
+
+export SASSBIN_FOLDER	:= $(CURDIR)/$(ROMFS)
+export ROMFS_FOLDERS	:= $(SASSBIN_FOLDER)
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD) \
-			$(addprefix -include ,$(HFILES_BIN))
+			-I$(CURDIR)/$(BUILD)
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
@@ -160,19 +167,24 @@ endif
 .PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
-all: $(BUILD)
+all: $(ROMFS_TARGETS) | $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
+$(ROMFS_TARGETS): | $(ROMFS_FOLDERS)
+
+$(ROMFS_FOLDERS):
+	@mkdir -p $@
+
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
 ifeq ($(strip $(APP_JSON)),)
-	@rm -fr $(BUILD) $(TARGET).nro $(TARGET).nacp $(TARGET).elf
+	@rm -fr $(BUILD) $(ROMFS_FOLDERS) $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 else
-	@rm -fr $(BUILD) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm $(TARGET).elf
+	@rm -fr $(BUILD) $(ROMFS_FOLDERS) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm $(TARGET).elf
 endif
 
 
@@ -190,9 +202,9 @@ ifeq ($(strip $(APP_JSON)),)
 all	:	$(OUTPUT).nro
 
 ifeq ($(strip $(NO_NACP)),)
-$(OUTPUT).nro	:	$(OUTPUT).elf $(OUTPUT).nacp
+$(OUTPUT).nro	:	$(OUTPUT).elf $(OUTPUT).nacp $(ROMFS_DEPS)
 else
-$(OUTPUT).nro	:	$(OUTPUT).elf
+$(OUTPUT).nro	:	$(OUTPUT).elf $(ROMFS_DEPS)
 endif
 
 else
@@ -223,17 +235,5 @@ $(OFILES_SRC)	: $(HFILES_BIN)
 endif
 #---------------------------------------------------------------------------------
 
-define shader-as
-	$(eval CURBIN := $(notdir $(1:.sass=.sass.bin)))
-	$(eval DEPSFILE := $(DEPSDIR)/$(CURBIN).d)
-	echo "$(CURBIN).o: $1" > $(DEPSFILE)
-	echo "extern const unsigned char" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"_end[];" > `(echo $(CURBIN) | tr . _)`.h
-	echo "extern const unsigned char" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`"[];" >> `(echo $(CURBIN) | tr . _)`.h
-	echo "extern const unsigned int" `(echo $(CURBIN) | sed -e 's/^\([0-9]\)/_\1/' | tr . _)`_size";" >> `(echo $(CURBIN) | tr . _)`.h
-	@nxas $1 -o $(CURBIN)
-	bin2s $(CURBIN) | $(AS) -o $(CURBIN).o
-	echo assembled ... $(notdir $<)
-endef
-
-%.sass.bin.o %_sass.h:	%.sass
-	@$(call shader-as,$<)
+$(SASSBIN_FOLDER)/%.sass.bin:	%.sass
+	nxas $< -o $@
