@@ -8,29 +8,6 @@
 #include "graphics_context.h"
 #include "helper.h"
 
-static int bpp(DkImageFormat format)
-{
-    switch (format)
-    {
-    case DkImageFormat_S8:
-        return 1;
-    case DkImageFormat_Z16:
-        return 2;
-    case DkImageFormat_RGBA8_Unorm:
-    case DkImageFormat_Z24X8:
-    case DkImageFormat_ZF32:
-    case DkImageFormat_Z24S8:
-        return 4;
-    case DkImageFormat_ZF32_X24S8:
-        return 8;
-    case DkImageFormat_RGBA32_Float:
-        return 16;
-    default:
-        printf("no format %d\n", format);
-        return 1;
-    }
-}
-
 static int blk_flags(int type)
 {
     int const generic = DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached;
@@ -82,18 +59,17 @@ DkCmdBuf make_cmdbuf(struct gfx_context* ctx, size_t size)
     return cmdbuf;
 }
 
-void make_linear_render_target(
+static void make_image(
     struct gfx_context* ctx, DkImageFormat format, int width, int height,
-    DkImage* image, DkMemBlock* memblock)
+    DkImage* image, DkMemBlock* memblock, int flags)
 {
     DkImageLayoutMaker layout_mk;
     dkImageLayoutMakerDefaults(&layout_mk, ctx->device);
-    layout_mk.flags = DkImageFlags_UsageRender;
+    layout_mk.flags = flags;
     layout_mk.format = format;
     layout_mk.dimensions[0] = width;
     layout_mk.dimensions[1] = height;
     layout_mk.mipLevels = 1;
-    layout_mk.pitchStride = width * bpp(format);
 
     DkImageLayout layout;
     dkImageLayoutInitialize(&layout, &layout_mk);
@@ -101,6 +77,21 @@ void make_linear_render_target(
     *memblock = make_memblock(ctx, dkImageLayoutGetSize(&layout), BLOCK_IMAGE);
 
     dkImageInitialize(image, &layout, *memblock, 0);
+}
+
+void make_image2d(
+    struct gfx_context* ctx, DkImageFormat format, int width, int height,
+    DkImage* image, DkMemBlock* memblock)
+{
+    make_image(ctx, format, width, height, image, memblock, 0);
+}
+
+void make_render_target(
+    struct gfx_context* ctx, DkImageFormat format, int width, int height,
+    DkImage* image, DkMemBlock* memblock)
+{
+    make_image(
+        ctx, format, width, height, image, memblock, DkImageFlags_UsageRender);
 }
 
 DkImageView make_image_view(DkImage const* image)
@@ -139,4 +130,22 @@ DkShader make_shader(struct gfx_context* ctx, char const* glsl_name)
     dkShaderMakerDefaults(&shader_mk, dksh_blk, 0);
     dkShaderInitialize(&shader, &shader_mk);
     return shader;
+}
+
+DkGpuAddr bind_tic_pool(struct gfx_context* ctx, DkCmdBuf cmdbuf, uint32_t num)
+{
+    size_t const size = num * sizeof(DkImageDescriptor);
+    DkMemBlock const memblock = make_memblock(ctx, size, BLOCK_NONE);
+    DkGpuAddr const addr = dkMemBlockGetGpuAddr(memblock);
+    dkCmdBufBindImageDescriptorSet(cmdbuf, addr, num);
+    return addr;
+}
+
+DkGpuAddr bind_tsc_pool(struct gfx_context* ctx, DkCmdBuf cmdbuf, uint32_t num)
+{
+    size_t const size = num * sizeof(DkSamplerDescriptor);
+    DkMemBlock const memblock = make_memblock(ctx, size, BLOCK_NONE);
+    DkGpuAddr const addr = dkMemBlockGetGpuAddr(memblock);
+    dkCmdBufBindSamplerDescriptorSet(cmdbuf, addr, num);
+    return addr;
 }

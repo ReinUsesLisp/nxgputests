@@ -24,10 +24,18 @@ DkMemBlock make_memblock(struct gfx_context* ctx, size_t size, int type);
 
 DkCmdBuf make_cmdbuf(struct gfx_context* ctx, size_t size);
 
-void make_linear_render_target(
+void make_image2d(
+	struct gfx_context* ctx, DkImageFormat format, int width, int height,
+	DkImage* image, DkMemBlock* memblock);
+
+void make_render_target(
 	struct gfx_context* ctx, DkImageFormat format, int width, int height,
 	DkImage* image, DkMemBlock* memblock);
 
 DkImageView make_image_view(DkImage const* image);
 
 DkShader make_shader(struct gfx_context* ctx, char const* glsl_name);
+
+DkGpuAddr bind_tic_pool(struct gfx_context* ctx, DkCmdBuf cmdbuf, uint32_t num);
+
+DkGpuAddr bind_tsc_pool(struct gfx_context* ctx, DkCmdBuf cmdbuf, uint32_t num);

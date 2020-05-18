@@ -22,11 +22,26 @@ struct gfx_test_descriptor
     u64 expected;
 };
 
+static void bind_texture(
+    DkCmdBuf cmdbuf, DkGpuAddr tic_addr, DkGpuAddr tsc_addr,
+    DkImageDescriptor image_desc, DkSamplerDescriptor sampler_desc,
+    DkStage stage, uint32_t index)
+{
+    DkResHandle const handle = dkMakeTextureHandle(index, index);
+    tic_addr += index * sizeof(image_desc);
+    tsc_addr += index * sizeof(sampler_desc);
+
+    dkCmdBufPushData(cmdbuf, tic_addr, &image_desc, sizeof(image_desc)); 
+    dkCmdBufPushData(cmdbuf, tsc_addr, &sampler_desc, sizeof(sampler_desc));
+    dkCmdBufBindTexture(cmdbuf, stage, index, handle);
+}
+
 #define BASIC_INIT(format, is_color)                                   \
     DkImage render_target;                                             \
     DkMemBlock render_target_memblock;                                 \
-    make_linear_render_target(                                         \
-        ctx, format, 64, 64, &render_target, &render_target_memblock); \
+    make_render_target(                                                \
+        ctx, DkImageFormat_##format, 64, 64, &render_target,           \
+        &render_target_memblock);                                      \
     DkImageView render_target_view = make_image_view(&render_target);  \
     DkCmdBuf const cmdbuf = make_cmdbuf(ctx, 1024);                    \
     DkImageView const* const color_rt_view[] = {&render_target_view};  \
@@ -48,7 +63,7 @@ struct gfx_test_descriptor
 
 DEFINE_TEST(clear)
 {
-    BASIC_INIT(DkImageFormat_RGBA8_Unorm, true)
+    BASIC_INIT(RGBA8_Unorm, true)
 
     static float const clear_color[4] = {1.0f, 0.8f, 0.25f, 0.125f};
     dkCmdBufClearColor(cmdbuf, 0, DkColorMask_RGBA, clear_color);
@@ -58,7 +73,7 @@ DEFINE_TEST(clear)
 
 DEFINE_TEST(clear_scissor)
 {
-    BASIC_INIT(DkImageFormat_RGBA32_Float, true)
+    BASIC_INIT(RGBA32_Float, true)
 
     static float const background_color[4] = {0.13f, 0.54f, 65.2f, -3.5f};
     static float const scissor_color[4] = {102.4f, 0.0f, -43.2f, 8.13f};
@@ -74,7 +89,7 @@ DEFINE_TEST(clear_scissor)
 
 DEFINE_TEST(clear_scissor_masked)
 {
-    BASIC_INIT(DkImageFormat_RGBA32_Float, true)
+    BASIC_INIT(RGBA32_Float, true)
 
     static float const background_color[4] = {0.13f, 0.54f, 65.2f, -3.5f};
     static float const scissor_color[4] = {102.4f, 0.0f, -43.2f, 8.13f};
@@ -88,11 +103,40 @@ DEFINE_TEST(clear_scissor_masked)
     BASIC_END
 }
 
+#define BIND_TEXTURE_POOLS \
+    DkGpuAddr const tic_addr = bind_tic_pool(ctx, cmdbuf, 32); \
+    DkGpuAddr const tsc_addr = bind_tsc_pool(ctx, cmdbuf, 1);
+
+#define MAKE_IMAGE2D(name, format, width, height)                            \
+    DkImage name;                                                            \
+    DkImageView name ## _view;                                               \
+    DkMemBlock name ## _blk;                                                 \
+    make_image2d(                                                            \
+        ctx, DkImageFormat_ ## format, width, height, &name, &name ## _blk); \
+    dkImageViewDefaults(&name##_view, &name);
+
+#define MAKE_SAMPLER(name)    \
+    DkSampler name;           \
+    dkSamplerDefaults(&name);
+
+#define REGISTER_IMAGE(name)                                                 \
+    DkImageDescriptor name ## _desc;                                         \
+    dkImageDescriptorInitialize(&name ## _desc, &name##_view, false, false);
+
+#define REGISTER_SAMPLER(name)                            \
+    DkSamplerDescriptor name ## _desc;                    \
+    dkSamplerDescriptorInitialize(&name ## _desc, &name);
+
+#define BIND_TEXTURE(image, sampler, stage, index)                \
+    bind_texture(                                                 \
+        cmdbuf, tic_addr, tsc_addr, image##_desc, sampler##_desc, \
+        DkStage_##stage, index);
+
 DEFINE_TEST(clear_depth)
 {
     DkImage render_target;
     DkMemBlock render_target_memblock;
-    make_linear_render_target(
+    make_render_target(
         ctx, DkImageFormat_ZF32, 64, 64, &render_target, &render_target_memblock);
     DkImageView render_target_view = make_image_view(&render_target);
 
@@ -113,10 +157,56 @@ DEFINE_TEST(clear_depth)
 
 DEFINE_TEST(basic_draw)
 {
-    BASIC_INIT(DkImageFormat_RGBA32_Float, true)
+    BASIC_INIT(RGBA32_Float, true)
 
     BIND_SHADER(Vertex, "full_screen_tri.vert")
     BIND_SHADER(Fragment, "red.frag")
+
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
+
+    BASIC_END
+}
+
+DEFINE_TEST(sample_depth)
+{
+    BASIC_INIT(RGBA32_Float, true)
+
+    BIND_SHADER(Vertex, "full_screen_tri.vert")
+    BIND_SHADER(Fragment, "sample.frag")
+
+    BIND_TEXTURE_POOLS
+
+    MAKE_SAMPLER(sampler)
+    MAKE_IMAGE2D(image, Z24S8, 32, 32)
+    image_view.dsSource = DkDsSource_Depth;
+
+    REGISTER_IMAGE(image)
+    REGISTER_SAMPLER(sampler)
+
+    BIND_TEXTURE(image, sampler, Fragment, 0)
+
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
+
+    BASIC_END
+}
+
+DEFINE_TEST(sample_stencil)
+{
+    BASIC_INIT(RGBA32_Float, true)
+
+    BIND_SHADER(Vertex, "full_screen_tri.vert")
+    BIND_SHADER(Fragment, "sample.frag")
+
+    BIND_TEXTURE_POOLS
+
+    MAKE_SAMPLER(sampler)
+    MAKE_IMAGE2D(image, Z24S8, 32, 32)
+    image_view.dsSource = DkDsSource_Stencil;
+
+    REGISTER_IMAGE(image)
+    REGISTER_SAMPLER(sampler)
+
+    BIND_TEXTURE(image, sampler, Fragment, 0)
 
     dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
 
@@ -130,6 +220,8 @@ static struct gfx_test_descriptor test_descriptors[] =
     TEST(clear_scissor_masked, 0x69292f52fbda15c1),
     TEST(clear_depth,          0x139f492006278563),
     TEST(basic_draw,           0x1137a01933ff0447),
+    TEST(sample_depth,         0x32b6f47c1d590d6b),
+    TEST(sample_stencil,       0x043b47c71b564fda),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
