@@ -40,6 +40,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source source/compute_tests
+SHADERS		:=	source/shaders
 DATA		:=	data
 INCLUDES	:=	source
 ROMFS		:=	$(BUILD)/romfs
@@ -87,7 +88,7 @@ export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-SASSFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.sass)))
+SASSFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.sass)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
@@ -235,5 +236,5 @@ $(OFILES_SRC)	: $(HFILES_BIN)
 endif
 #---------------------------------------------------------------------------------
 
-$(SASSBIN_FOLDER)/%.sass.bin:	%.sass
+$(SASSBIN_FOLDER)/%.sass.bin:	$(SHADERS)/%.sass
 	nxas $< -o $@
