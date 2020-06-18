@@ -222,6 +222,63 @@ DEFINE_TEST(sample_stencil)
     BASIC_END
 }
 
+#define DEFINE_RT_FORMAT_TEST(format)                            \
+    DEFINE_TEST(rendertarget_ ## format)                         \
+    {                                                            \
+        BASIC_INIT(format, true)                                 \
+                                                                 \
+        BIND_SHADER(Vertex, "full_screen_tri.vert")              \
+        BIND_SHADER(Fragment, "fuzz_color.frag")                 \
+                                                                 \
+        dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0); \
+                                                                 \
+        BASIC_END                                                \
+    }
+
+DEFINE_RT_FORMAT_TEST(R8_Unorm)
+DEFINE_RT_FORMAT_TEST(R8_Snorm)
+DEFINE_RT_FORMAT_TEST(R8_Uint)
+DEFINE_RT_FORMAT_TEST(R8_Sint)
+DEFINE_RT_FORMAT_TEST(R16_Float)
+DEFINE_RT_FORMAT_TEST(R16_Unorm)
+DEFINE_RT_FORMAT_TEST(R16_Snorm)
+DEFINE_RT_FORMAT_TEST(R16_Uint)
+DEFINE_RT_FORMAT_TEST(R16_Sint)
+DEFINE_RT_FORMAT_TEST(R32_Float)
+DEFINE_RT_FORMAT_TEST(R32_Uint)
+DEFINE_RT_FORMAT_TEST(R32_Sint)
+DEFINE_RT_FORMAT_TEST(RG8_Unorm)
+DEFINE_RT_FORMAT_TEST(RG8_Snorm)
+DEFINE_RT_FORMAT_TEST(RG8_Uint)
+DEFINE_RT_FORMAT_TEST(RG8_Sint)
+DEFINE_RT_FORMAT_TEST(RG16_Float)
+DEFINE_RT_FORMAT_TEST(RG16_Unorm)
+DEFINE_RT_FORMAT_TEST(RG16_Snorm)
+DEFINE_RT_FORMAT_TEST(RG16_Uint)
+DEFINE_RT_FORMAT_TEST(RG16_Sint)
+DEFINE_RT_FORMAT_TEST(RG32_Float)
+DEFINE_RT_FORMAT_TEST(RG32_Uint)
+DEFINE_RT_FORMAT_TEST(RG32_Sint)
+DEFINE_RT_FORMAT_TEST(RGBA8_Unorm)
+DEFINE_RT_FORMAT_TEST(RGBA8_Snorm)
+DEFINE_RT_FORMAT_TEST(RGBA8_Uint)
+DEFINE_RT_FORMAT_TEST(RGBA8_Sint)
+DEFINE_RT_FORMAT_TEST(RGBA16_Float)
+DEFINE_RT_FORMAT_TEST(RGBA16_Unorm)
+DEFINE_RT_FORMAT_TEST(RGBA16_Snorm)
+DEFINE_RT_FORMAT_TEST(RGBA16_Uint)
+DEFINE_RT_FORMAT_TEST(RGBA16_Sint)
+DEFINE_RT_FORMAT_TEST(RGBA32_Float)
+DEFINE_RT_FORMAT_TEST(RGBA32_Uint)
+DEFINE_RT_FORMAT_TEST(RGBA32_Sint)
+DEFINE_RT_FORMAT_TEST(RGBA8_Unorm_sRGB)
+DEFINE_RT_FORMAT_TEST(RGB10A2_Unorm)
+DEFINE_RT_FORMAT_TEST(RGB10A2_Uint)
+DEFINE_RT_FORMAT_TEST(RG11B10_Float)
+DEFINE_RT_FORMAT_TEST(BGR565_Unorm)
+DEFINE_RT_FORMAT_TEST(BGR5_Unorm)
+DEFINE_RT_FORMAT_TEST(BGR5A1_Unorm)
+
 static struct gfx_test_descriptor test_descriptors[] =
 {
     TEST(clear,                         0xbe7e7dc089ef7f01),
@@ -231,6 +288,49 @@ static struct gfx_test_descriptor test_descriptors[] =
     TEST(basic_draw,                    0xfed0c683282b8c9b),
     TEST(sample_depth,                  0x8f8453b80d43b141),
     TEST(sample_stencil,                0x890be20f007a5d63),
+    TEST(rendertarget_R8_Unorm,         0xd0aa953f5a8e22ad),
+    TEST(rendertarget_R8_Snorm,         0x2ea4001217fe238e),
+    TEST(rendertarget_R8_Uint,          0x5d69079daa54ffeb),
+    TEST(rendertarget_R8_Sint,          0xb79de734743a4689),
+    TEST(rendertarget_R16_Float,        0x79fbae9bc6d3972d),
+    TEST(rendertarget_R16_Unorm,        0xb343d24ed714334f),
+    TEST(rendertarget_R16_Snorm,        0xfbda7c8204645069),
+    TEST(rendertarget_R16_Uint,         0x6f079795eb063566),
+    TEST(rendertarget_R16_Sint,         0xb1c56727af9a35cb),
+    TEST(rendertarget_R32_Float,        0x564d61cb1bab8347),
+    TEST(rendertarget_R32_Uint,         0x564d61cb1bab8347),
+    TEST(rendertarget_R32_Sint,         0x564d61cb1bab8347),
+    TEST(rendertarget_RG8_Unorm,        0x6ade1edbebf83393),
+    TEST(rendertarget_RG8_Snorm,        0x486522ba74fedf60),
+    TEST(rendertarget_RG8_Uint,         0x6f079795eb063566),
+    TEST(rendertarget_RG8_Sint,         0xca9113540fb0b566),
+    TEST(rendertarget_RG16_Float,       0x30f92e5c2b309aa9),
+    TEST(rendertarget_RG16_Unorm,       0x4420cce8f63b8afe),
+    TEST(rendertarget_RG16_Snorm,       0xb63a5b92d0ab9d68),
+    TEST(rendertarget_RG16_Uint,        0x390880fe5b0f2af2),
+    TEST(rendertarget_RG16_Sint,        0xc839dbd13e3da371),
+    TEST(rendertarget_RG32_Float,       0x8585df754b87fe15),
+    TEST(rendertarget_RG32_Uint,        0x8585df754b87fe15),
+    TEST(rendertarget_RG32_Sint,        0x8585df754b87fe15),
+    TEST(rendertarget_RGBA8_Unorm,      0x12c91e487df61323),
+    TEST(rendertarget_RGBA8_Snorm,      0x2782acd49ca7a0e5),
+    TEST(rendertarget_RGBA8_Uint,       0x390880fe5b0f2af2),
+    TEST(rendertarget_RGBA8_Sint,       0xe884ffdc9e1a3208),
+    TEST(rendertarget_RGBA16_Float,     0xf345aa894c06a1af),
+    TEST(rendertarget_RGBA16_Unorm,     0x2216ddb02a79dbb4),
+    TEST(rendertarget_RGBA16_Snorm,     0x60a5d95e7117142c),
+    TEST(rendertarget_RGBA16_Uint,      0xdd6a90bf7212daf3),
+    TEST(rendertarget_RGBA16_Sint,      0x46aee7b6ceab87e2),
+    TEST(rendertarget_RGBA32_Float,     0x255868473ad4e375),
+    TEST(rendertarget_RGBA32_Uint,      0x255868473ad4e375),
+    TEST(rendertarget_RGBA32_Sint,      0x255868473ad4e375),
+    TEST(rendertarget_RGBA8_Unorm_sRGB, 0x1d57ef21e3f576c8),
+    TEST(rendertarget_RGB10A2_Unorm,    0x45eda0ecf04bfa88),
+    TEST(rendertarget_RGB10A2_Uint,     0x390880fe5b0f2af2),
+    TEST(rendertarget_RG11B10_Float,    0x39438fa833bda8e8),
+    TEST(rendertarget_BGR565_Unorm,     0xb343d24ed714334f),
+    TEST(rendertarget_BGR5_Unorm,       0xebf86c919ae27e38),
+    TEST(rendertarget_BGR5A1_Unorm,     0x9f97010b1deb3324),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
