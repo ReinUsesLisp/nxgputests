@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <inttypes.h>
 
 #include <deko3d.h>
@@ -47,7 +48,11 @@ static void bind_texture(
     DkImageView const* const color_rt_view[] = {&render_target_view};  \
     DkImageView* zeta_rt_view = is_color ? NULL : &render_target_view; \
     dkCmdBufBindRenderTargets(                                         \
-        cmdbuf, color_rt_view, is_color ? 1 : 0, zeta_rt_view);
+        cmdbuf, color_rt_view, is_color ? 1 : 0, zeta_rt_view);        \
+    {                                                                  \
+        DkViewport viewport = {0, 0, 64, 64, 0, 1};                    \
+        dkCmdBufSetViewports(cmdbuf, 0, &viewport, 1);                 \
+    }
 
 #define BIND_SHADER(type, name) \
     do {                                                              \
@@ -60,6 +65,35 @@ static void bind_texture(
     dkQueueSubmitCommands(ctx->queue, dkCmdBufFinishList(cmdbuf)); \
     dkQueueWaitIdle(ctx->queue);                                   \
     return render_target_memblock;
+
+#define BIND_TEXTURE_POOLS \
+    DkGpuAddr const tic_addr = bind_tic_pool(ctx, cmdbuf, 32); \
+    DkGpuAddr const tsc_addr = bind_tsc_pool(ctx, cmdbuf, 1);
+
+#define MAKE_IMAGE2D(name, format, width, height)                            \
+    DkImage name;                                                            \
+    DkImageView name ## _view;                                               \
+    DkMemBlock name ## _blk;                                                 \
+    make_image2d(                                                            \
+        ctx, DkImageFormat_ ## format, width, height, &name, &name ## _blk); \
+    dkImageViewDefaults(&name##_view, &name);
+
+#define MAKE_SAMPLER(name)    \
+    DkSampler name;           \
+    dkSamplerDefaults(&name);
+
+#define REGISTER_IMAGE(name)                                                 \
+    DkImageDescriptor name ## _desc;                                         \
+    dkImageDescriptorInitialize(&name ## _desc, &name##_view, false, false);
+
+#define REGISTER_SAMPLER(name)                            \
+    DkSamplerDescriptor name ## _desc;                    \
+    dkSamplerDescriptorInitialize(&name ## _desc, &name);
+
+#define BIND_TEXTURE(image, sampler, stage, index)                \
+    bind_texture(                                                 \
+        cmdbuf, tic_addr, tsc_addr, image##_desc, sampler##_desc, \
+        DkStage_##stage, index);
 
 DEFINE_TEST(clear)
 {
@@ -102,35 +136,6 @@ DEFINE_TEST(clear_scissor_masked)
 
     BASIC_END
 }
-
-#define BIND_TEXTURE_POOLS \
-    DkGpuAddr const tic_addr = bind_tic_pool(ctx, cmdbuf, 32); \
-    DkGpuAddr const tsc_addr = bind_tsc_pool(ctx, cmdbuf, 1);
-
-#define MAKE_IMAGE2D(name, format, width, height)                            \
-    DkImage name;                                                            \
-    DkImageView name ## _view;                                               \
-    DkMemBlock name ## _blk;                                                 \
-    make_image2d(                                                            \
-        ctx, DkImageFormat_ ## format, width, height, &name, &name ## _blk); \
-    dkImageViewDefaults(&name##_view, &name);
-
-#define MAKE_SAMPLER(name)    \
-    DkSampler name;           \
-    dkSamplerDefaults(&name);
-
-#define REGISTER_IMAGE(name)                                                 \
-    DkImageDescriptor name ## _desc;                                         \
-    dkImageDescriptorInitialize(&name ## _desc, &name##_view, false, false);
-
-#define REGISTER_SAMPLER(name)                            \
-    DkSamplerDescriptor name ## _desc;                    \
-    dkSamplerDescriptorInitialize(&name ## _desc, &name);
-
-#define BIND_TEXTURE(image, sampler, stage, index)                \
-    bind_texture(                                                 \
-        cmdbuf, tic_addr, tsc_addr, image##_desc, sampler##_desc, \
-        DkStage_##stage, index);
 
 DEFINE_TEST(clear_depth)
 {
@@ -180,6 +185,8 @@ DEFINE_TEST(sample_depth)
     MAKE_IMAGE2D(image, Z24S8, 32, 32)
     image_view.dsSource = DkDsSource_Depth;
 
+    memset(dkMemBlockGetCpuAddr(image_blk), 0xaa, dkMemBlockGetSize(image_blk));
+
     REGISTER_IMAGE(image)
     REGISTER_SAMPLER(sampler)
 
@@ -203,6 +210,8 @@ DEFINE_TEST(sample_stencil)
     MAKE_IMAGE2D(image, Z24S8, 32, 32)
     image_view.dsSource = DkDsSource_Stencil;
 
+    memset(dkMemBlockGetCpuAddr(image_blk), 0xaa, dkMemBlockGetSize(image_blk));
+
     REGISTER_IMAGE(image)
     REGISTER_SAMPLER(sampler)
 
@@ -215,13 +224,13 @@ DEFINE_TEST(sample_stencil)
 
 static struct gfx_test_descriptor test_descriptors[] =
 {
-    TEST(clear,                0xbe7e7dc089ef7f01),
-    TEST(clear_scissor,        0x27750a82ffacde28),
-    TEST(clear_scissor_masked, 0x69292f52fbda15c1),
-    TEST(clear_depth,          0x139f492006278563),
-    TEST(basic_draw,           0x1137a01933ff0447),
-    TEST(sample_depth,         0x32b6f47c1d590d6b),
-    TEST(sample_stencil,       0x043b47c71b564fda),
+    TEST(clear,                         0xbe7e7dc089ef7f01),
+    TEST(clear_scissor,                 0x27750a82ffacde28),
+    TEST(clear_scissor_masked,          0x69292f52fbda15c1),
+    TEST(clear_depth,                   0x139f492006278563),
+    TEST(basic_draw,                    0xfed0c683282b8c9b),
+    TEST(sample_depth,                  0x8f8453b80d43b141),
+    TEST(sample_stencil,                0x890be20f007a5d63),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
