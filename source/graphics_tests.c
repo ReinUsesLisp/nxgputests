@@ -222,6 +222,53 @@ DEFINE_TEST(sample_stencil)
     BASIC_END
 }
 
+DEFINE_TEST(robust_vertex_buffer)
+{
+    BASIC_INIT(RGBA8_Unorm, true)
+
+    BIND_SHADER(Vertex, "basic.vert")
+    BIND_SHADER(Fragment, "color.frag")
+
+    static float const positions[] = {
+        -1.0f, -1.0f, 0.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f,
+         1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f,
+    };
+    static float const colors[] = {
+        1.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+    };
+    static DkVtxAttribState const vtx_attrib_state[] = {
+        { .bufferId = 1, .size = DkVtxAttribSize_4x32, .type = DkVtxAttribType_Float, },
+        { .bufferId = 0, .size = DkVtxAttribSize_4x32, .type = DkVtxAttribType_Float, },
+    };
+    static DkVtxBufferState const vtx_buffer_state[] = {
+        { .stride = 4 * sizeof(float), },
+        { .stride = 4 * sizeof(float), },
+    };
+
+    DkMemBlock positions_blk = make_memblock(ctx, sizeof(positions), BLOCK_NONE);
+    DkMemBlock colors_blk = make_memblock(ctx, sizeof(colors), BLOCK_NONE);
+
+    memcpy(dkMemBlockGetCpuAddr(positions_blk), positions, sizeof(positions));
+    memcpy(dkMemBlockGetCpuAddr(colors_blk), colors, sizeof(colors));
+
+    DkBufExtents const buffer_extents[] = {
+        { .addr = dkMemBlockGetGpuAddr(colors_blk),    .size = sizeof(float) * 4 * 2, },
+        { .addr = dkMemBlockGetGpuAddr(positions_blk), .size = sizeof(float) * 4 * 4, },
+    };
+
+    dkCmdBufBindVtxAttribState(cmdbuf, vtx_attrib_state, 2);
+    dkCmdBufBindVtxBufferState(cmdbuf, vtx_buffer_state, 2);
+    dkCmdBufBindVtxBuffers(cmdbuf, 0, buffer_extents, 2);
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Quads, 4, 1, 0, 0);
+
+    BASIC_END
+}
+
 #define DEFINE_RT_FORMAT_TEST(format)                            \
     DEFINE_TEST(rendertarget_ ## format)                         \
     {                                                            \
@@ -288,6 +335,7 @@ static struct gfx_test_descriptor test_descriptors[] =
     TEST(basic_draw,                    0xfed0c683282b8c9b),
     TEST(sample_depth,                  0x8f8453b80d43b141),
     TEST(sample_stencil,                0x890be20f007a5d63),
+    TEST(robust_vertex_buffer,          0x03406eca6029fae3),
     TEST(rendertarget_R8_Unorm,         0xd0aa953f5a8e22ad),
     TEST(rendertarget_R8_Snorm,         0x2ea4001217fe238e),
     TEST(rendertarget_R8_Uint,          0x5d69079daa54ffeb),
