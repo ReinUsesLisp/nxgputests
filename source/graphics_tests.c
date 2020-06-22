@@ -269,17 +269,23 @@ DEFINE_TEST(robust_vertex_buffer)
     BASIC_END
 }
 
-#define DEFINE_RT_FORMAT_TEST(format)                            \
-    DEFINE_TEST(rendertarget_ ## format)                         \
-    {                                                            \
-        BASIC_INIT(format, true)                                 \
-                                                                 \
-        BIND_SHADER(Vertex, "full_screen_tri.vert")              \
-        BIND_SHADER(Fragment, "fuzz_color.frag")                 \
-                                                                 \
-        dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0); \
-                                                                 \
-        BASIC_END                                                \
+static void rendertarget_test_template(
+    struct gfx_context* ctx, DkCmdBuf cmdbuf)
+{
+    BIND_SHADER(Vertex, "full_screen_tri.vert")
+    BIND_SHADER(Fragment, "fuzz_color.frag")
+
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
+}
+
+#define DEFINE_RT_FORMAT_TEST(format)            \
+    DEFINE_TEST(rendertarget_ ## format)         \
+    {                                            \
+        BASIC_INIT(format, true)                 \
+                                                 \
+        rendertarget_test_template(ctx, cmdbuf); \
+                                                 \
+        BASIC_END                                \
     }
 
 DEFINE_RT_FORMAT_TEST(R8_Unorm)
