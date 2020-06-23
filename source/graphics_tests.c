@@ -341,7 +341,7 @@ static DkMemBlock attrib_format_test_template(
 
     BASIC_INIT(RGBA16_Float, true)
 
-    BIND_SHADER(Vertex, "full_screen_tri.vert");
+    BIND_SHADER(Vertex, "colored_full_screen_tri.vert");
     BIND_SHADER(Fragment, "color.frag");
 
     DkMemBlock color_blk = make_memblock(ctx, sizeof(data), BLOCK_NONE);
