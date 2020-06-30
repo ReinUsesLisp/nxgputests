@@ -269,8 +269,7 @@ DEFINE_TEST(robust_vertex_buffer)
     BASIC_END
 }
 
-static void rendertarget_test_template(
-    struct gfx_context* ctx, DkCmdBuf cmdbuf)
+static void rendertarget_test_template(struct gfx_context* ctx, DkCmdBuf cmdbuf)
 {
     BIND_SHADER(Vertex, "full_screen_tri.vert")
     BIND_SHADER(Fragment, "fuzz_color.frag")
@@ -468,6 +467,145 @@ DEFINE_ATTRIB_FORMAT_TEST(RG11B10, Uint,    _11_11_10)
 DEFINE_ATTRIB_FORMAT_TEST(RG11B10, Sscaled, _11_11_10)
 DEFINE_ATTRIB_FORMAT_TEST(RG11B10, Uscaled, _11_11_10)
 DEFINE_ATTRIB_FORMAT_TEST(RG11B10, Float,   _11_11_10)
+
+static DkMemBlock sample_color_template(
+    struct gfx_context* ctx, DkImageFormat format)
+{
+    BASIC_INIT(RGBA16_Float, true)
+
+    BIND_SHADER(Vertex, "full_screen_tri.vert")
+    BIND_SHADER(Fragment, "sample.frag")
+
+    BIND_TEXTURE_POOLS
+
+    MAKE_SAMPLER(sampler)
+
+    DkImage image;
+    DkImageView image_view;
+    DkMemBlock image_blk;
+    make_image2d(ctx, format, 32, 32, &image, &image_blk);
+
+    dkImageViewDefaults(&image_view, &image);
+
+    uint8_t* data = dkMemBlockGetCpuAddr(image_blk);
+    size_t size = dkMemBlockGetSize(image_blk);
+    memset(data, 0, size);
+    for (size_t i = 0; i < size; i += sizeof(uint32_t)) {
+        uint32_t value = 0xa82c2c11;
+        memcpy(&data[i], &value, sizeof(uint32_t));
+    }
+
+    REGISTER_IMAGE(image)
+    REGISTER_SAMPLER(sampler)
+
+    BIND_TEXTURE(image, sampler, Fragment, 0)
+
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
+
+    BASIC_END
+}
+
+#define DEFINE_TEX_FORMAT_TEST(format)                               \
+    DEFINE_TEST(texformat_ ## format)                                \
+    {                                                                \
+        return sample_color_template(ctx, DkImageFormat_ ## format); \
+    }
+
+DEFINE_TEX_FORMAT_TEST(R8_Unorm)
+DEFINE_TEX_FORMAT_TEST(R8_Snorm)
+DEFINE_TEX_FORMAT_TEST(R8_Uint)
+DEFINE_TEX_FORMAT_TEST(R8_Sint)
+DEFINE_TEX_FORMAT_TEST(R16_Float)
+DEFINE_TEX_FORMAT_TEST(R16_Unorm)
+DEFINE_TEX_FORMAT_TEST(R16_Snorm)
+DEFINE_TEX_FORMAT_TEST(R16_Uint)
+DEFINE_TEX_FORMAT_TEST(R16_Sint)
+DEFINE_TEX_FORMAT_TEST(R32_Float)
+DEFINE_TEX_FORMAT_TEST(R32_Uint)
+DEFINE_TEX_FORMAT_TEST(R32_Sint)
+DEFINE_TEX_FORMAT_TEST(RG8_Unorm)
+DEFINE_TEX_FORMAT_TEST(RG8_Snorm)
+DEFINE_TEX_FORMAT_TEST(RG8_Uint)
+DEFINE_TEX_FORMAT_TEST(RG8_Sint)
+DEFINE_TEX_FORMAT_TEST(RG16_Float)
+DEFINE_TEX_FORMAT_TEST(RG16_Unorm)
+DEFINE_TEX_FORMAT_TEST(RG16_Snorm)
+DEFINE_TEX_FORMAT_TEST(RG16_Uint)
+DEFINE_TEX_FORMAT_TEST(RG16_Sint)
+DEFINE_TEX_FORMAT_TEST(RG32_Float)
+DEFINE_TEX_FORMAT_TEST(RG32_Uint)
+DEFINE_TEX_FORMAT_TEST(RG32_Sint)
+DEFINE_TEX_FORMAT_TEST(RGB32_Float)
+DEFINE_TEX_FORMAT_TEST(RGB32_Uint)
+DEFINE_TEX_FORMAT_TEST(RGB32_Sint)
+DEFINE_TEX_FORMAT_TEST(RGBA8_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGBA8_Snorm)
+DEFINE_TEX_FORMAT_TEST(RGBA8_Uint)
+DEFINE_TEX_FORMAT_TEST(RGBA8_Sint)
+DEFINE_TEX_FORMAT_TEST(RGBA16_Float)
+DEFINE_TEX_FORMAT_TEST(RGBA16_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGBA16_Snorm)
+DEFINE_TEX_FORMAT_TEST(RGBA16_Uint)
+DEFINE_TEX_FORMAT_TEST(RGBA16_Sint)
+DEFINE_TEX_FORMAT_TEST(RGBA32_Float)
+DEFINE_TEX_FORMAT_TEST(RGBA32_Uint)
+DEFINE_TEX_FORMAT_TEST(RGBA32_Sint)
+DEFINE_TEX_FORMAT_TEST(RGBX8_Unorm_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA8_Unorm_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA4_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGB5_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGB5A1_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGB565_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGB10A2_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGB10A2_Uint)
+DEFINE_TEX_FORMAT_TEST(RG11B10_Float)
+DEFINE_TEX_FORMAT_TEST(E5BGR9_Float)
+DEFINE_TEX_FORMAT_TEST(RGB_BC1)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC1)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC2)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC3)
+DEFINE_TEX_FORMAT_TEST(RGB_BC1_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC1_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC2_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC3_sRGB)
+DEFINE_TEX_FORMAT_TEST(R_BC4_Unorm)
+DEFINE_TEX_FORMAT_TEST(R_BC4_Snorm)
+DEFINE_TEX_FORMAT_TEST(RG_BC5_Unorm)
+DEFINE_TEX_FORMAT_TEST(RG_BC5_Snorm)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC7_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC7_Unorm_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC6H_SF16_Float)
+DEFINE_TEX_FORMAT_TEST(RGBA_BC6H_UF16_Float)
+DEFINE_TEX_FORMAT_TEST(RGBX8_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGBX8_Snorm)
+DEFINE_TEX_FORMAT_TEST(RGBX8_Uint)
+DEFINE_TEX_FORMAT_TEST(RGBX8_Sint)
+DEFINE_TEX_FORMAT_TEST(RGBX16_Float)
+DEFINE_TEX_FORMAT_TEST(RGBX16_Unorm)
+DEFINE_TEX_FORMAT_TEST(RGBX16_Snorm)
+DEFINE_TEX_FORMAT_TEST(RGBX16_Uint)
+DEFINE_TEX_FORMAT_TEST(RGBX16_Sint)
+DEFINE_TEX_FORMAT_TEST(RGBX32_Float)
+DEFINE_TEX_FORMAT_TEST(RGBX32_Uint)
+DEFINE_TEX_FORMAT_TEST(RGBX32_Sint)
+DEFINE_TEX_FORMAT_TEST(BGR565_Unorm)
+DEFINE_TEX_FORMAT_TEST(BGR5_Unorm)
+DEFINE_TEX_FORMAT_TEST(BGR5A1_Unorm)
+DEFINE_TEX_FORMAT_TEST(A5BGR5_Unorm)
+DEFINE_TEX_FORMAT_TEST(BGRX8_Unorm)
+DEFINE_TEX_FORMAT_TEST(BGRA8_Unorm)
+DEFINE_TEX_FORMAT_TEST(BGRX8_Unorm_sRGB)
+DEFINE_TEX_FORMAT_TEST(BGRA8_Unorm_sRGB)
+DEFINE_TEX_FORMAT_TEST(R_ETC2_Unorm)
+DEFINE_TEX_FORMAT_TEST(R_ETC2_Snorm)
+DEFINE_TEX_FORMAT_TEST(RG_ETC2_Unorm)
+DEFINE_TEX_FORMAT_TEST(RG_ETC2_Snorm)
+DEFINE_TEX_FORMAT_TEST(RGB_ETC2)
+DEFINE_TEX_FORMAT_TEST(RGB_PTA_ETC2)
+DEFINE_TEX_FORMAT_TEST(RGBA_ETC2)
+DEFINE_TEX_FORMAT_TEST(RGB_ETC2_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGB_PTA_ETC2_sRGB)
+DEFINE_TEX_FORMAT_TEST(RGBA_ETC2_sRGB)
 
 static struct gfx_test_descriptor test_descriptors[] =
 {
@@ -708,6 +846,101 @@ static struct gfx_test_descriptor test_descriptors[] =
     TEST(attrib_format_RG11B10f_Sscaled, 0xd14293b7508f5e02),
     TEST(attrib_format_RG11B10f_Uscaled, 0xa27d87ca940e1e91),
     TEST(attrib_format_RG11B10f_Float,   0x97faca746b3e9d67),
+    TEST(texformat_R8_Unorm,             0x38a872341106306b),
+    TEST(texformat_R8_Snorm,             0x3a73d531f971ec27),
+    TEST(texformat_R8_Uint,              0x8b899afc1decd881),
+    TEST(texformat_R8_Sint,              0x9746371ef4be161f),
+    TEST(texformat_R16_Float,            0xe2fab6c42db4ad17),
+    TEST(texformat_R16_Unorm,            0x776b716e0f3c7ca0),
+    TEST(texformat_R16_Snorm,            0xcf8fd7ddf68e75de),
+    TEST(texformat_R16_Uint,             0x8b899afc1decd881),
+    TEST(texformat_R16_Sint,             0x19646da2dff6a75c),
+    TEST(texformat_R32_Float,            0xe5c9202223675223),
+    TEST(texformat_R32_Uint,             0x85cbafe88b6511d0),
+    TEST(texformat_R32_Sint,             0x85cbafe88b6511d0),
+    TEST(texformat_RG8_Unorm,            0x7ddf23b30ec20893),
+    TEST(texformat_RG8_Snorm,            0xfaba82176b188055),
+    TEST(texformat_RG8_Uint,             0x8b899afc1decd881),
+    TEST(texformat_RG8_Sint,             0xca44d28dca7d5903),
+    TEST(texformat_RG16_Float,           0x0ec45258257f6103),
+    TEST(texformat_RG16_Unorm,           0x46b15946c77a5890),
+    TEST(texformat_RG16_Snorm,           0xe4e3764efe369736),
+    TEST(texformat_RG16_Uint,            0x8b899afc1decd881),
+    TEST(texformat_RG16_Sint,            0x22a802a4efa84029),
+    TEST(texformat_RG32_Float,           0x76f95eac3e27aa02),
+    TEST(texformat_RG32_Uint,            0xcf9e1d1fa98ea4aa),
+    TEST(texformat_RG32_Sint,            0xcf9e1d1fa98ea4aa),
+    TEST(texformat_RGB32_Float,          0x1d448d0238b8f839),
+    TEST(texformat_RGB32_Uint,           0xc6b856228f7b3f76),
+    TEST(texformat_RGB32_Sint,           0xc6b856228f7b3f76),
+    TEST(texformat_RGBA8_Unorm,          0x0a85e8d275651cca),
+    TEST(texformat_RGBA8_Snorm,          0x2e8814956307e14d),
+    TEST(texformat_RGBA8_Uint,           0x8b899afc1decd881),
+    TEST(texformat_RGBA8_Sint,           0x0205b9c09069ea73),
+    TEST(texformat_RGBA16_Float,         0x6bacf54692efc41b),
+    TEST(texformat_RGBA16_Unorm,         0xf694da903a75b390),
+    TEST(texformat_RGBA16_Snorm,         0xd2999b920822d231),
+    TEST(texformat_RGBA16_Uint,          0x8b899afc1decd881),
+    TEST(texformat_RGBA16_Sint,          0x4716e88916780e48),
+    TEST(texformat_RGBA32_Float,         0x9416d278e177c3c4),
+    TEST(texformat_RGBA32_Uint,          0x9416d278e177c3c4),
+    TEST(texformat_RGBA32_Sint,          0x9416d278e177c3c4),
+    TEST(texformat_RGBX8_Unorm_sRGB,     0xcb2b2f3970d3a95f),
+    TEST(texformat_RGBA8_Unorm_sRGB,     0xef52feffe2b50891),
+    TEST(texformat_RGBA4_Unorm,          0x6ca5df2ea6ff0f69),
+    TEST(texformat_RGB5_Unorm,           0x88233040036d752c),
+    TEST(texformat_RGB5A1_Unorm,         0x84f47991ae6956f7),
+    TEST(texformat_RGB565_Unorm,         0x3fedc6c8b3354418),
+    TEST(texformat_RGB10A2_Unorm,        0xd4e22542691de3b3),
+    TEST(texformat_RGB10A2_Uint,         0x8b899afc1decd881),
+    TEST(texformat_RG11B10_Float,        0x3fde9157463dccf5),
+    TEST(texformat_E5BGR9_Float,         0xea5d1ba2c6c3ad74),
+    TEST(texformat_RGB_BC1,              0xf92a23cb4afd91d6),
+    TEST(texformat_RGBA_BC1,             0x6b5db93056db0fb5),
+    TEST(texformat_RGBA_BC2,             0x5a16100528cb1dc9),
+    TEST(texformat_RGBA_BC3,             0x29e4193bc9bade9f),
+    TEST(texformat_RGB_BC1_sRGB,         0xc4815efdbb335db3),
+    TEST(texformat_RGBA_BC1_sRGB,        0xe3875cc8cd0bbe21),
+    TEST(texformat_RGBA_BC2_sRGB,        0x093dc9fbb215fcec),
+    TEST(texformat_RGBA_BC3_sRGB,        0xc1dfb35871d8304a),
+    TEST(texformat_R_BC4_Unorm,          0x53fb04a9c2d40011),
+    TEST(texformat_R_BC4_Snorm,          0x92a9044fc6394c75),
+    TEST(texformat_RG_BC5_Unorm,         0xf1ed8d0b6f9e73d9),
+    TEST(texformat_RG_BC5_Snorm,         0x8d94636f1b2f140e),
+    TEST(texformat_RGBA_BC7_Unorm,       0xa064cc418c36aace),
+    TEST(texformat_RGBA_BC7_Unorm_sRGB,  0xdec62ff805037d88),
+    TEST(texformat_RGBA_BC6H_SF16_Float, 0x28d4f459a4d58ab2),
+    TEST(texformat_RGBA_BC6H_UF16_Float, 0x7e8f4d590746a1ff),
+    TEST(texformat_RGBX8_Unorm,          0x4b771c9a9104e034),
+    TEST(texformat_RGBX8_Snorm,          0x4f0324b6323b0cd3),
+    TEST(texformat_RGBX8_Uint,           0x8b899afc1decd881),
+    TEST(texformat_RGBX8_Sint,           0x8b899afc1decd881),
+    TEST(texformat_RGBX16_Float,         0x32c689f0da2fe21c),
+    TEST(texformat_RGBX16_Unorm,         0xefb8251f1b3165c4),
+    TEST(texformat_RGBX16_Snorm,         0x655bedc61718f71b),
+    TEST(texformat_RGBX16_Uint,          0x8b899afc1decd881),
+    TEST(texformat_RGBX16_Sint,          0x22a802a4efa84029),
+    TEST(texformat_RGBX32_Float,         0xdc486b29d7dfebb1),
+    TEST(texformat_RGBX32_Uint,          0xffde34b4351cd60a),
+    TEST(texformat_RGBX32_Sint,          0xffde34b4351cd60a),
+    TEST(texformat_BGR565_Unorm,         0x2e276972f60eb4f9),
+    TEST(texformat_BGR5_Unorm,           0x22e95dddbb492b7c),
+    TEST(texformat_BGR5A1_Unorm,         0x65d77cdb6b548233),
+    TEST(texformat_A5BGR5_Unorm,         0x923cbdb0498d86e0),
+    TEST(texformat_BGRX8_Unorm,          0xbd5a0a9bd2444ad0),
+    TEST(texformat_BGRA8_Unorm,          0xdea22ad0c163bf93),
+    TEST(texformat_BGRX8_Unorm_sRGB,     0x37d86ae217d86784),
+    TEST(texformat_BGRA8_Unorm_sRGB,     0x97051709a437b05a),
+    TEST(texformat_R_ETC2_Unorm,         0x31409308094e1301),
+    TEST(texformat_R_ETC2_Snorm,         0xc599fe9696e1c7ea),
+    TEST(texformat_RG_ETC2_Unorm,        0xec623fd0ebdb3f78),
+    TEST(texformat_RG_ETC2_Snorm,        0x4ba027a98cd88e74),
+    TEST(texformat_RGB_ETC2,             0xf4a83650da0f4b20),
+    TEST(texformat_RGB_PTA_ETC2,         0x98f385018ed2871d),
+    TEST(texformat_RGBA_ETC2,            0x8ef97f0af0288021),
+    TEST(texformat_RGB_ETC2_sRGB,        0x08817ad848f0eace),
+    TEST(texformat_RGB_PTA_ETC2_sRGB,    0x40cd807f8ba4e0c2),
+    TEST(texformat_RGBA_ETC2_sRGB,       0x2afa3a8f61258107),
 };
 #define NUM_TESTS (sizeof(test_descriptors) / sizeof(test_descriptors[0]))
 
