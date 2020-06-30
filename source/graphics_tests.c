@@ -328,7 +328,6 @@ DEFINE_RT_FORMAT_TEST(RGB10A2_Unorm)
 DEFINE_RT_FORMAT_TEST(RGB10A2_Uint)
 DEFINE_RT_FORMAT_TEST(RG11B10_Float)
 DEFINE_RT_FORMAT_TEST(BGR565_Unorm)
-DEFINE_RT_FORMAT_TEST(BGR5_Unorm)
 DEFINE_RT_FORMAT_TEST(BGR5A1_Unorm)
 
 static DkMemBlock attrib_format_test_template(
@@ -658,7 +657,6 @@ static struct gfx_test_descriptor test_descriptors[] =
     TEST(rendertarget_RGB10A2_Uint,      0x390880fe5b0f2af2),
     TEST(rendertarget_RG11B10_Float,     0x39438fa833bda8e8),
     TEST(rendertarget_BGR565_Unorm,      0xb343d24ed714334f),
-    TEST(rendertarget_BGR5_Unorm,        0xebf86c919ae27e38),
     TEST(rendertarget_BGR5A1_Unorm,      0x9f97010b1deb3324),
     TEST(attrib_format_R32_Snorm,        0xac8b885a95f4b1f2),
     TEST(attrib_format_R32_Unorm,        0xdbebe7f43c0e07e3),
