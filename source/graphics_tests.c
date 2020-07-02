@@ -222,6 +222,124 @@ DEFINE_TEST(sample_stencil)
     BASIC_END
 }
 
+static DkMemBlock sampler_template(struct gfx_context* ctx, DkSampler sampler)
+{
+    BASIC_INIT(RGBA8_Unorm, true)
+
+    BIND_SHADER(Vertex, "full_screen_tri.vert")
+    BIND_SHADER(Fragment, "sample_wrap.frag")
+
+    BIND_TEXTURE_POOLS
+
+    MAKE_IMAGE2D(image, RGBA8_Unorm, 64, 64)
+
+    sampler.minFilter = DkFilter_Linear;
+    sampler.magFilter = DkFilter_Linear;
+
+    uint8_t* data = dkMemBlockGetCpuAddr(image_blk);
+    size_t size = dkMemBlockGetSize(image_blk);
+    memset(data, 0, size);
+
+    uint32_t const values[] = {0xdeadbeef, 0xcafecafe, 0xdedede00, 0xacdc0000};
+    for (size_t i = 0; i < size; i += sizeof(uint32_t)) {
+        size_t seed = (i >> 2) + i / 73 + i / 103;
+        uint32_t value = values[seed % 4];
+        memcpy(&data[i], &value, sizeof(uint32_t));
+    }
+
+    REGISTER_IMAGE(image)
+    REGISTER_SAMPLER(sampler)
+
+    BIND_TEXTURE(image, sampler, Fragment, 0)
+
+    dkCmdBufDraw(cmdbuf, DkPrimitive_Triangles, 3, 1, 0, 0);
+
+    BASIC_END
+}
+
+static void set_arbitrary_border(DkSampler* sampler)
+{
+    sampler->borderColor[0].value_f = 0.2;
+    sampler->borderColor[1].value_f = 0.8;
+    sampler->borderColor[2].value_f = 0.3;
+    sampler->borderColor[3].value_f = 0.5;
+}
+
+DEFINE_TEST(sampler_repeat)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_Repeat;
+    sampler.wrapMode[1] = DkWrapMode_Repeat;
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_mirrored_repeat)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_MirroredRepeat;
+    sampler.wrapMode[1] = DkWrapMode_MirroredRepeat;
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_clamp_to_edge)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_ClampToEdge;
+    sampler.wrapMode[1] = DkWrapMode_ClampToEdge;
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_clamp_to_border)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_ClampToBorder;
+    sampler.wrapMode[1] = DkWrapMode_ClampToBorder;
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_clamp_to_border_custom)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_ClampToBorder;
+    sampler.wrapMode[1] = DkWrapMode_ClampToBorder;
+    set_arbitrary_border(&sampler);
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_clamp)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_Clamp;
+    sampler.wrapMode[1] = DkWrapMode_Clamp;
+    set_arbitrary_border(&sampler);
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_mirror_clamp_to_edge)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_MirrorClampToEdge;
+    sampler.wrapMode[1] = DkWrapMode_MirrorClampToEdge;
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_mirror_clamp_to_border)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_MirrorClampToBorder;
+    sampler.wrapMode[1] = DkWrapMode_MirrorClampToBorder;
+    return sampler_template(ctx, sampler);
+}
+
+DEFINE_TEST(sampler_mirror_clamp)
+{
+    MAKE_SAMPLER(sampler);
+    sampler.wrapMode[0] = DkWrapMode_MirrorClamp;
+    sampler.wrapMode[1] = DkWrapMode_MirrorClamp;
+    set_arbitrary_border(&sampler);
+    return sampler_template(ctx, sampler);
+}
+
 DEFINE_TEST(robust_vertex_buffer)
 {
     BASIC_INIT(RGBA8_Unorm, true)
@@ -616,6 +734,15 @@ static struct gfx_test_descriptor test_descriptors[] =
     TEST(sample_depth,                   0x8f8453b80d43b141),
     TEST(sample_stencil,                 0x890be20f007a5d63),
     TEST(robust_vertex_buffer,           0x03406eca6029fae3),
+    TEST(sampler_repeat,                 0x4b001fb424249863),
+    TEST(sampler_mirrored_repeat,        0xf73c778ff8e0627d),
+    TEST(sampler_clamp_to_edge,          0x4ba0154827a52fd0),
+    TEST(sampler_clamp_to_border,        0x320ea6e9a42b7446),
+    TEST(sampler_clamp_to_border_custom, 0x9bca3c0b1e30f2cd),
+    TEST(sampler_clamp,                  0xe0f3047488987068),
+    TEST(sampler_mirror_clamp_to_edge,   0x9698b023de1b3ab6),
+    TEST(sampler_mirror_clamp_to_border, 0x8fb5abb331f10c30),
+    TEST(sampler_mirror_clamp,           0x9519c4e1f29b47f6),
     TEST(rendertarget_R8_Unorm,          0xd0aa953f5a8e22ad),
     TEST(rendertarget_R8_Snorm,          0x2ea4001217fe238e),
     TEST(rendertarget_R8_Uint,           0x5d69079daa54ffeb),
