@@ -1,0 +1,21 @@
+        MOV R2, c[0x0][0x140];
+        MOV R3, c[0x0][0x144];
+        MOV R0, 10;
+        MOV R1, 1;
+        SSY exit;
+        PBK break;
+        SSY badexit;
+loop:
+        IADD R1, R1, R1;
+        IADD R0.CC, R0, -1;
+        BRK CC.EQ;
+        BRA loop;
+break:
+        SYNC;
+
+badexit:
+        MOV32I R1, 0xdeadbeef;
+
+exit:
+        STG.E [R2], R1;
+        EXIT;
